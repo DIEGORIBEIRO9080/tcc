@@ -1,0 +1,57 @@
+{% include 'managements/colaborators/partials/head.html' %}
+    <body>
+        <!-- Fim da sidebar -->
+        {% include 'global/partials/sidebar.html' %}
+        <!-- Fim da sidebar -->
+
+        <div class="content">
+            {% include 'global/partials/header.html' %}
+            <div class="table-wrapper">
+                {% include 'managements/colaborators/partials/headerTable.html' %}
+                <table class="table" border="1" cellspacing="0" cellpadding="8">
+                    {% include 'managements/colaborators/partials/thead.html' %}
+                    <tbody>
+                        {% if page_obj %}
+                            {% for colaborador in page_obj %}
+                                {% include 'managements/colaborators/partials/colaborators.html' %}
+                            {% endfor %}
+
+                            {% for i in empty_rows %}
+                                <tr class="empty-row">
+                                    <td colspan="7"></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7">Nenhum colaborador cadastrado.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <!-- MODAL ÚNICO -->
+                <div id="modalImagem" class="modal-img" onclick="fecharImagem()">
+                    <span class="close">&times;</span>
+                    <img id="imagemGrande">
+                </div>
+            </div>
+            {% include 'global/partials/pagination.html' %}
+            {% include 'global/partials/footer.html' %}
+        </div>
+        
+        <script>
+        function abrirImagem(src) {
+            const modal = document.getElementById("modalImagem");
+            const img = document.getElementById("imagemGrande");
+
+            img.src = src;
+            modal.style.display = "flex";
+        }
+
+        function fecharImagem() {
+            document.getElementById("modalImagem").style.display = "none";
+        }
+        </script>
+
+
+    </body>
+</html>

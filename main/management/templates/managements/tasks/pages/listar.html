@@ -1,0 +1,44 @@
+{% include 'managements/tasks/partials/head.html' %}
+<body>
+
+    {% include 'global/partials/sidebar.html' %}
+
+    <div class="content">
+
+        {% include 'global/partials/header.html' %}
+
+        <div class="table-wrapper">
+            {% include 'managements/tasks/partials/headerTable.html' %}
+
+            <table class="table" border="1" cellspacing="0" cellpadding="8">
+                {% include 'managements/tasks/partials/thead.html' %}
+                
+                <tbody>
+                    {% for tarefa in page_obj %}
+                        {% include 'managements/tasks/partials/tasks.html' with tarefa=tarefa %}
+
+                    {% empty %}
+                        <tr>
+                            <td colspan="11" style="text-align: center;">Nenhuma tarefa cadastrada</td>
+                        </tr>
+                    {% endfor %}
+
+                    {# === LINHAS VAZIAS PARA COMPLETAR 10 === #}
+                    {% for _ in empty_rows %}
+                        <tr class="empty-row">
+                            <td colspan="11"></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+
+        {% include 'global/partials/pagination.html' %}
+        {% include 'global/partials/footer.html' %}
+
+    </div>
+
+</body>
+</html>

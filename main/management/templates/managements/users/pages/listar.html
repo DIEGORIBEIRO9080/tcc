@@ -1,0 +1,42 @@
+{% include 'managements/users/partials/head.html' %}
+<body>
+
+    {% include 'global/partials/sidebar.html' %}
+
+    <div class="content">
+
+        {% include 'global/partials/header.html' %}
+
+        <div class="table-wrapper">
+            {% include 'managements/users/partials/headerTable.html' %}
+
+            <table class="table" border="1" cellspacing="0" cellpadding="8">
+                {% include 'managements/users/partials/thead.html' %}
+
+                <tbody>
+                    {% for user in page_obj %}
+                        {% include 'managements/users/partials/users.html' with user=user %}
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center;">
+                                Nenhum usuário cadastrado
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    {% for _ in empty_rows %}
+                        <tr class="empty-row">
+                            <td colspan="5"></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'global/partials/pagination.html' %}
+        {% include 'global/partials/footer.html' %}
+
+    </div>
+
+</body>
+</html>

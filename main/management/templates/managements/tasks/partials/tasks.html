@@ -1,0 +1,37 @@
+    <tr>
+        <td>{{ tarefa.titulo }}</td>
+        <td>{{ tarefa.descricao|default:"—" }}</td>
+        <td>{{ tarefa.get_nivel_sujeira_display }}</td>
+        <td>{{ tarefa.data_inicio|date:"Y-m-d H:i" }}</td>
+        <td>{{ tarefa.data_previsao_termino|date:"Y-m-d H:i" }}</td>
+        <td>{{ tarefa.data_termino|default:"—" }}</td>
+        <td>{{ tarefa.get_prioridade_display }}</td>
+
+        <!-- COLABORADORES (ManyToMany via through) -->
+        <td>
+            {% for colab in tarefa.colaboradores.all %}
+                {{ colab.nome }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                —
+            {% endfor %}
+        </td>
+
+        <!-- SETORES (ManyToMany via through) -->
+        <td>
+            {% for setor in tarefa.setores.all %}
+                {{ setor.nome }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                —
+            {% endfor %}
+        </td>
+
+        <td>{{ tarefa.get_status_display }}</td>
+
+        <!-- BOTÕES -->
+        <td class="acoes">
+            <i class="fa-solid fa-check-double icone-concluido"></i>
+            <i class="fa-solid fa-xmark icone-pendente"></i>
+            <i class="fa-solid fa-pencil icone-editar" title="Editar"></i>
+            <i class="fa-solid fa-trash icone-excluir" title="Excluir"></i>
+        </td>
+    </tr>

@@ -1,0 +1,31 @@
+    <tr>
+        <td class="img-col">
+            {% if colaborador.imagem %}
+                <img 
+                    src="{{ colaborador.imagem.url }}" 
+                    alt="Foto de {{ colaborador.nome }}"
+                    class="img-thumb"
+                    onclick="abrirImagem('{{ colaborador.imagem.url }}')"
+                >
+            {% else %}
+                <img 
+                    src="/static/img/default-user.png" 
+                    alt="Foto padrão"
+                    class="img-thumb"
+                    onclick="abrirImagem('/static/img/default-user.png')"
+                >
+            {% endif %}
+        </td>
+
+        <td>{{ colaborador.nome }}</td>
+        <td>{{ colaborador.telefone }}</td>
+        <td>{{ colaborador.numero_empresa }}</td>
+        <td>{{ colaborador.data_admissao|date:"d/m/Y" }}</td>
+        <td>{{ colaborador.get_status_display }}</td>
+        <td>
+            <i class="fa-solid fa-user-minus icone-ferias"></i>
+            <i class="fa-solid fa-power-off desligado"></i>
+            <i class="fa-solid fa-pencil editar" title="Editar"></i>
+            <i class="fa-solid fa-trash excluir" title="Excluir"></i>
+        </td>
+    </tr>

@@ -1,0 +1,52 @@
+{% include 'managements/sectors/partials/head.html' %}
+    <body>
+        {% include 'global/partials/sidebar.html' %}
+         
+        <!-- Grid 2 -->
+        <div class="content">
+            {% include 'global/partials/header.html' %}
+
+            <div class="table-wrapper">
+                {% include 'managements/sectors/partials/headerTable.html' %}
+
+                <table class="table" border="1" cellspacing="0" cellpadding="8">
+                    {% include 'managements/sectors/partials/thead.html' %}
+                    <tbody>
+                        {% for setor in page_obj %}
+                            {% include 'managements/sectors/partials/sectors.html' with setor=setor %}
+                        {% endfor %}
+                        {% for _ in empty_rows %}
+                            <tr class="empty-row">
+                                <td colspan="8"></td>
+                            </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+                <!-- MODAL ÚNICO -->
+                <div id="modalImagem" class="modal-img" onclick="fecharImagem()">
+                    <span class="close">&times;</span>
+                    <img id="imagemGrande">
+                </div>
+            </div>
+
+            {% include 'global/partials/pagination.html' %}
+            {% include 'global/partials/footer.html' %}
+        </div>
+
+        <script>
+        function abrirImagem(src) {
+            const modal = document.getElementById("modalImagem");
+            const img = document.getElementById("imagemGrande");
+
+            img.src = src;
+            modal.style.display = "flex";
+        }
+
+        function fecharImagem() {
+            document.getElementById("modalImagem").style.display = "none";
+        }
+        </script>
+
+    </body>
+</html>

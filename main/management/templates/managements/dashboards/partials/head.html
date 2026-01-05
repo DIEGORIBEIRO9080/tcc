@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+
+        <style>
+            * {
+                color: #AEB9E1;
+                font-family: 'Mona Sans', sans-serif;
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                font-size: 62.5%;
+            }
+
+            body{
+                font-size: 1.6rem;
+                background-color: #081028;
+            }
+
+            .container{
+                max-width: 144rem;
+                background-color: red;
+                margin: 0 auto;
+            }
+
+            .main-header-container{
+                background-color: #081028;
+            }
+            /* parte da grid */
+            body {
+                margin: 0;
+                display: grid;
+                grid-template-columns: 200px 1fr; /* Sidebar fixa 200px + conteúdo */
+                height: 100vh;
+            }
+
+            .sidebar {
+                grid-column: 1; /* primeira coluna */
+                border-right: 1px solid #e0dddd;
+            }
+
+            .content {
+                grid-column: 2; /* segunda coluna */
+                
+            }
+            .grafico {
+                background-color: #0B1739;
+            }
+            .dashboard {
+                display: grid;
+                grid-template-rows: auto 0.7fr 2fr 1fr auto; 
+                height: 100vh;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            /* HEADER */
+            .header {
+                background-color: #0F1A3A;
+                padding: 1px;
+            }
+
+            /* TOP – 4 quadrados */
+            .top {
+                background-color: yellow;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 30px;
+                height: 180px;
+                padding: 5px;
+            }
+
+            /* SQUARES */
+            .square {
+                width: 100%;
+                background-color: aliceblue;
+                height: 100%;
+                border-radius: 20px;
+            }
+
+            /* MIDDLE */
+            .middle {
+                background-color: aqua;
+                width: 100%;
+                height: 100%;
+            }
+
+            /* BOTTOM */
+            .bottom {
+                background-color: blue;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .small-graph {
+                background-color: chartreuse;
+                width: 100%;
+                height: 100%;
+            }
+
+            /* FOOTER */
+            .footer {
+                background-color: #0F1A3A;
+                padding: 20px;
+                text-align: center;
+            }
+
+
+
+        </style>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    
+    </head>

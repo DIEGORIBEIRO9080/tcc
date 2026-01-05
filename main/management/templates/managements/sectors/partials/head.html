@@ -1,0 +1,90 @@
+{% include 'global/partials/head.html' %}
+    <style>
+        /* Imagem do setor*/
+        .img-col img {
+            width: 76px;   /* +3px */
+            height: 56px;  /* +3px */
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+            border-radius: 50%;
+        }
+        i{
+            padding-left:10px;
+        }
+        .icone-ferias{
+            color:rgb(53, 184, 44);
+            
+        }
+        .desligado{
+            color:red;
+            padding-right: 8px;
+        }
+
+        /* Paginação */
+        .pagination {
+            margin-left: 55px;  /* +5px */
+        }
+        .filtros-container {
+            padding-left: 80px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .filtro-btn {
+            background: none;
+            border: none;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filtro-btn span {
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .icon {
+            stroke: #ffffff;
+            fill: none;
+        }
+
+        .img-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Modal */
+        .modal-img {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-img img {
+            max-width: 90%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+
+        .modal-img .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: white;
+            cursor: pointer;
+        }
+        
+    </style>
