@@ -3,10 +3,13 @@ from django.core.paginator import Paginator
 from .models import Colaborador, Setor, Tarefa
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import permission_required
 
 def home(request):
     return render(request, 'managements/dashboards/pages/listar.html')
 
+
+@permission_required('management.view_tarefa', raise_exception=True)
 def sectors(request):
     setores_list = Setor.objects.all().order_by('nome')
     paginator = Paginator(setores_list, 10)  # 10 linhas por página
@@ -24,7 +27,7 @@ def sectors(request):
         'empty_rows': range(empty_rows)
     })
 
-
+@permission_required('management.view_tarefa', raise_exception=True)
 def colaborators(request):
     colaboradores_list = Colaborador.objects.all().order_by('nome')  # você pode ordenar por algum campo
     paginator = Paginator(colaboradores_list, 10)  # 10 colaboradores por página
@@ -42,6 +45,7 @@ def colaborators(request):
         "empty_rows": range(empty_rows)
     })
 
+@permission_required('management.view_tarefa', raise_exception=True)
 def tasks(request):
     tarefas = Tarefa.objects.all().order_by('-data_inicio')
 
@@ -57,6 +61,7 @@ def tasks(request):
         'page_obj': page_obj,
         'empty_rows': range(empty_rows),
     })
+
 
 def is_admin(user):
     return user.is_superuser

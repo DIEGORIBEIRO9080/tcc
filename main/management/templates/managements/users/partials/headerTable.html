@@ -1,7 +1,10 @@
 <div class="headerTable">
     <h2 class="titleTable">Usuários Cadastrados</h2>
 
-    <a href="{% url 'authors:usuarios_cadastrar' %}" class="btn">
-        Cadastrar Usuário
-    </a>
+    {% if perms.authors.add_user %}
+        <a href="{% url 'authors:usuarios_cadastrar' %}" class="btn">
+            Cadastrar Usuário
+        </a>
+    {% endif %}
+
 </div>
