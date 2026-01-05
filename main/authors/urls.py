@@ -5,5 +5,6 @@ app_name = 'authors'
 
 urlpatterns = [
     path('cadastrar/', register_view , name='usuarios_cadastrar'),
+    path('create/', register_create , name='create'),
 
 ]

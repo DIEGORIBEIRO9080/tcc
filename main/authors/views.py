@@ -6,13 +6,15 @@ from django.contrib import messages
 
 def register_view(request):
 
-    form= RegisterForm()
+    request.session['number'] = request.session.get('number', 0) + 1
+
+    form = RegisterForm(request.POST)
 
     return render(request, 'authors/cadastro/index.html', {'form':form, }  )
 
 def register_create(request):
-    if not request.post:
-        raise Http404()
+    if request.method != "POST":  # ✅ se não for POST, volta para o formulário
+        return redirect('authors:usuarios_cadastrar')
 
     POST = request.POST
     request.session['register_form_data'] = POST
@@ -22,6 +24,8 @@ def register_create(request):
         form.save()
         messages.success(request, ' você criou um usuario')
 
-        del(request.session['register_form_data'])
+        # Limpa os dados da sessão
+        if 'register_form_data' in request.session:
+            del request.session['register_form_data']
 
-    return redirect('authors:cadastrar')
+    return redirect('authors:usuarios_cadastrar')

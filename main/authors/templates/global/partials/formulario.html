@@ -1,14 +1,26 @@
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
-    <form method="POST">
+    <form action=" {% url 'authors:create' %} "   method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% for field in form %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{field}}
+
+            {% if field.help_text %}
+                <p class="help_text">{{ field.help_text }}</p>
+            {% endif %}
+
+            {{ field.errors }}
+
+        {% endfor %}
+
+
         <button type="submit" class="btn-submit">Cadastrar Usuário</button>
     </form>
 
