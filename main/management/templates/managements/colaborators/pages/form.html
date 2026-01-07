@@ -1,0 +1,39 @@
+{% include 'managements/sectors/partials/head.html' %}
+    <body>
+        {% include 'global/partials/sidebar.html' %}
+         
+        <!-- Grid 2 -->
+        <div class="content">
+            {% include 'global/partials/header.html' %}
+
+            <div class="table-wrapper">
+                <h2>
+                    {% if setor %}
+                        Editar Colaborador
+                    {% else %}
+                        Cadastrar colaborador
+                    {% endif %}
+                </h2>
+
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div>
+                            <label>{{ field.label }}</label>
+                            {{ field }}
+                            {{ field.errors }}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit">Salvar</button>
+                </form>
+            </div>
+
+
+                {% include 'global/partials/footer.html' %}
+        </div>
+
+    </body>
+</html>

@@ -25,7 +25,18 @@
         <td>
             <i class="fa-solid fa-user-minus icone-ferias"></i>
             <i class="fa-solid fa-power-off desligado"></i>
-            <i class="fa-solid fa-pencil editar" title="Editar"></i>
+
+
+            {% if perms.management.change_colaborador %}
+                <a href="{% url 'management:colaborador_edit' colaborador.id %}"
+                class="btn-icon edit"
+                title="Editar">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+            {% endif %}
+
+
+
             <i class="fa-solid fa-trash excluir" title="Excluir"></i>
         </td>
     </tr>

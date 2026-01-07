@@ -37,11 +37,23 @@ def register_create(request):
     form = RegisterForm(POST)
 
     if form.is_valid():
+        user = form.save(commit=False)
         form.save()
         messages.success(request, ' você criou um usuario')
 
         # Limpa os dados da sessão
         if 'register_form_data' in request.session:
             del request.session['register_form_data']
+
+        
+        role = form.cleaned_data['role']
+
+        if role == 'Admin':
+            user.is_superuser = True
+            user.is_staff = True
+            user.save()
+        else:
+            group = Group.objects.get(name=role)
+            user.groups.add(group)
 
     return redirect('authors:usuarios_cadastrar')

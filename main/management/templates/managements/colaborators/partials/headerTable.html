@@ -26,4 +26,13 @@
 
         </div>
 
+
+            {% if perms.management.add_colaborador %}
+                <a href="{% url 'management:colaborador_create' %}" class="btn">
+                    Cadastrar Colaborador
+                </a>
+            {% endif %}
+
+
+
     </div>

@@ -4,13 +4,17 @@
 
     <td>
         {% if user.is_superuser %}
-            Administrador
-        {% elif user.is_staff %}
-            Staff
+            Superuser
         {% else %}
-            Usuário
+            {% for group in user.groups.all %}
+                {{ group.name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                Sem grupo
+            {% endfor %}
         {% endif %}
     </td>
+
+
 
     <td>
         {% if user.is_active %}

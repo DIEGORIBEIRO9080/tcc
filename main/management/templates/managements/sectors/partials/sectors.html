@@ -25,7 +25,14 @@
         <td>{{ setor.mobilia }}</td>
 
         <td>
-            <i class="fa-solid fa-pencil"></i>
+            {% if perms.management.change_setor %}
+                <a href="{% url 'management:setor_edit' setor.id %}"
+                title="Editar setor"
+                class="btn-icon edit">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+            {% endif %}
+
             <i class="fa-solid fa-trash"></i>
         </td>
     </tr>

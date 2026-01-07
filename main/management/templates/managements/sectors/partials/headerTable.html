@@ -1,3 +1,9 @@
     <div class="headerTable">
         <h2 class="titleTable">Setores</h2>
+
+        {% if perms.management.add_setor %}
+            <a href="{% url 'management:setor_create' %}" class="btn">
+                Cadastrar Setor
+            </a>
+        {% endif %}
     </div>
