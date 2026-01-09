@@ -1,4 +1,4 @@
-{% include 'managements/sectors/partials/head.html' %}
+{% include 'managements/tasks/partials/head.html' %}
     <body>
         {% include 'global/partials/sidebar.html' %}
          
@@ -9,9 +9,9 @@
             <div class="table-wrapper">
                 <h2>
                     {% if setor %}
-                        Editar Setor
+                        Editar Tarefa
                     {% else %}
-                        Cadastrar Setor
+                        Cadastrar Tarefa
                     {% endif %}
                 </h2>
                 {% if messages %}
@@ -40,8 +40,6 @@
                     <button type="submit">Salvar</button>
                 </form>
             </div>
-
-
                 {% include 'global/partials/footer.html' %}
         </div>
 

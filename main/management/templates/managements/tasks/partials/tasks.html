@@ -31,7 +31,18 @@
         <td class="acoes">
             <i class="fa-solid fa-check-double icone-concluido"></i>
             <i class="fa-solid fa-xmark icone-pendente"></i>
-            <i class="fa-solid fa-pencil icone-editar" title="Editar"></i>
+
+
+
+            
+            {% if perms.management.change_tarefa %}
+                <a href="{% url 'management:tarefa_edit' tarefa.id %}"
+                class="icone-editar"
+                title="Editar">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+            {% endif %}
+
             <i class="fa-solid fa-trash icone-excluir" title="Excluir"></i>
         </td>
     </tr>

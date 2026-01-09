@@ -1,34 +1,42 @@
     <div class="headerTable">
         <h2 class="titleTable">Tarefas</h2>
-        <div class="filtros-container">
+        <div class="filtros">
 
-            <button class="filtro-btn" disabled>
-                <svg class="icon" width="22" height="22" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="18" height="18" rx="3"/>
-                </svg>
-                <span>Pendentes</span>
-            </button>
+            <form method="get" class="filtros-status">
 
-            <button class="filtro-btn" disabled>
-                <svg class="icon" width="22" height="22" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="18" height="18" rx="3"/>
-                </svg>
-                <span>Andamento</span>
-            </button>
+                <label class="filtro-check">
+                    <input type="checkbox" name="status" value="pendente"
+                    {% if 'pendente' in status_selecionados %}checked{% endif %}>
+                    <span>Pendentes</span>
+                </label>
 
-            <button class="filtro-btn" disabled>
-                <svg class="icon" width="22" height="22" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="18" height="18" rx="3"/>
-                </svg>
-                <span>Concluídas</span>
-            </button>
+                <label class="filtro-check">
+                    <input type="checkbox" name="status" value="em_andamento"
+                    {% if 'em_andamento' in status_selecionados %}checked{% endif %}>
+                    <span>Andamento</span>
+                </label>
 
-            <button class="filtro-btn" disabled>
-                <svg class="icon" width="22" height="22" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="18" height="18" rx="3"/>
-                </svg>
-                <span>Canceladas</span>
-            </button>
+                <label class="filtro-check">
+                    <input type="checkbox" name="status" value="concluida"
+                    {% if 'concluida' in status_selecionados %}checked{% endif %}>
+                    <span>Concluídas</span>
+                </label>
+
+                <label class="filtro-check">
+                    <input type="checkbox" name="status" value="cancelada"
+                    {% if 'cancelada' in status_selecionados %}checked{% endif %}>
+                    <span>Canceladas</span>
+                </label>
+
+                <button class='butaofiltro'   type="submit" class="btn">Filtrar</button>
+
+            </form>
 
         </div>
+        {% if perms.management.add_tarefas %}
+            <a href="{% url 'management:tarefa_create' %}" class="btn">
+                Cadastrar tarefa
+            </a>
+        {% endif %}
+
     </div>

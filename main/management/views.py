@@ -5,9 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
-from .forms import SetorForm
+from .forms import *
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import ColaboradorForm
 
 
 def home(request):
@@ -141,7 +140,12 @@ def colaborador_edit(request, id):
 ##############################################################################
 @permission_required('management.view_tarefa', raise_exception=True)
 def tasks(request):
+    status_selecionados = request.GET.getlist('status')
+
     tarefas = Tarefa.objects.all().order_by('-data_inicio')
+
+    if status_selecionados:
+        tarefas = tarefas.filter(status__in=status_selecionados)
 
     paginator = Paginator(tarefas, 10)  # 10 linhas por página
     page_number = request.GET.get('page')
@@ -154,9 +158,65 @@ def tasks(request):
     return render(request, 'managements/tasks/pages/listar.html', {
         'page_obj': page_obj,
         'empty_rows': range(empty_rows),
+        'status_selecionados': status_selecionados,
+    })
+
+@permission_required('management.add_tarefa', raise_exception=True)
+def tarefa_create(request):
+    if request.method == 'POST':
+        form = TarefaForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            tarefa= form.save()
+
+            setores = form.cleaned_data['setores']
+            colaboradores = form.cleaned_data['colaboradores']
+
+            tarefa.setores.set(setores)  # Django cuida do through
+            tarefa.colaboradores.set(colaboradores)
+            
+
+            messages.success(request, 'tarefa cadastrado com sucesso!')
+            return redirect('management:tasks')
+    else:
+        form = TarefaForm()
+
+    return render(request, 'managements/tasks/pages/form.html', {
+        'form': form
+    })
+
+@permission_required('management.change_tarefas', raise_exception=True)
+def tarefa_edit(request, id):
+    tarefa = get_object_or_404(Tarefa, id=id)
+
+    if request.method == 'POST':
+        form = TarefaForm(request.POST, request.FILES, instance=tarefa)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'tarefa atualizada com sucesso!')
+            return redirect('management:tasks')
+    else:
+        form = TarefaForm(instance=tarefa)
+
+    return render(request, 'managements/tasks/pages/form.html', {
+        'form': form,
+        'tarefa': tarefa
     })
 
 
+
+
+
+
+
+
+
+
+
+##############################################################################
+####################            USUARIOS        ##############################
+##############################################################################
 def is_admin(user):
     return user.is_superuser
 
