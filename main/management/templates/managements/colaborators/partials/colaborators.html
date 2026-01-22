@@ -22,21 +22,51 @@
         <td>{{ colaborador.numero_empresa }}</td>
         <td>{{ colaborador.data_admissao|date:"d/m/Y" }}</td>
         <td>{{ colaborador.get_status_display }}</td>
-        <td>
-            <i class="fa-solid fa-user-minus icone-ferias"></i>
-            <i class="fa-solid fa-power-off desligado"></i>
-
-
+        
+        <td class="acoes">
             {% if perms.management.change_colaborador %}
+                {% if colaborador.status == 'ativo' %}
+                    <!-- Ativo → Férias -->
+                    <a href="{% url 'management:colaborador_mudar_status' colaborador.id 'ferias' %}">
+                        <i class="fa-solid fa-user-minus icone-ferias" title="Férias"></i>
+                    </a>
+
+                    <!-- Ativo → Desligado -->
+                    <a href="{% url 'management:colaborador_mudar_status' colaborador.id 'desligado' %}">
+                        <i class="fa-solid fa-power-off desligado" title="Desligar"></i>
+                    </a>
+
+                {% elif colaborador.status == 'ferias' %}
+                    <!-- Férias → Ativo -->
+                    <a href="{% url 'management:colaborador_mudar_status' colaborador.id 'ativo' %}">
+                        <i class="fa-solid fa-arrows-rotate" title="Voltar ao ativo"></i>
+                    </a>
+
+                    <!-- Férias → Desligado -->
+                    <a href="{% url 'management:colaborador_mudar_status' colaborador.id 'desligado' %}">
+                        <i class="fa-solid fa-power-off desligado" title="Desligar"></i>
+                    </a>
+
+                {% elif colaborador.status == 'desligado' %}
+                    <!-- Desligado → Ativo -->
+                    <a href="{% url 'management:colaborador_mudar_status' colaborador.id 'ativo' %}">
+                        <i class="fa-solid fa-power-off ativo" title="Reativar"></i>
+                    </a>
+                {% endif %}
+
+            
                 <a href="{% url 'management:colaborador_edit' colaborador.id %}"
                 class="btn-icon edit"
                 title="Editar">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
+
+                <i class="fa-solid fa-trash excluir" title="Excluir"></i>
+
             {% endif %}
 
 
 
-            <i class="fa-solid fa-trash excluir" title="Excluir"></i>
+           
         </td>
     </tr>

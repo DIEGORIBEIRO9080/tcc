@@ -29,20 +29,46 @@
 
         <!-- BOTÕES -->
         <td class="acoes">
-            <i class="fa-solid fa-check-double icone-concluido"></i>
-            <i class="fa-solid fa-xmark icone-pendente"></i>
-
-
-
-            
             {% if perms.management.change_tarefa %}
-                <a href="{% url 'management:tarefa_edit' tarefa.id %}"
-                class="icone-editar"
-                title="Editar">
-                    <i class="fa-solid fa-pencil"></i>
-                </a>
+                {% if tarefa.status == 'pendente' %}
+                    <!-- vai para EM ANDAMENTO -->
+                    <a href="{% url 'management:alterar_status_tarefa' tarefa.id 'em_andamento' %}"
+                    title="Iniciar tarefa">
+                        <i class="fa-solid fa-check icone-andamento"></i>
+                    </a>
+
+                    <!-- vai para CANCELADA -->
+                    <a href="{% url 'management:alterar_status_tarefa' tarefa.id 'cancelada' %}"
+                    title="Cancelar tarefa">
+                        <i class="fa-solid fa-xmark icone-cancelado"></i>
+                    </a>
+
+                {% elif tarefa.status == 'em_andamento' %}
+                    <!-- vai para CONCLUÍDA -->
+                    <a href="{% url 'management:alterar_status_tarefa' tarefa.id 'concluida' %}"
+                    title="Concluir tarefa">
+                        <i class="fa-solid fa-check-double icone-concluido"></i>
+                    </a>
+
+                    <!-- volta para PENDENTE -->
+                    <a href="{% url 'management:alterar_status_tarefa' tarefa.id 'pendente' %}"
+                    title="Voltar para pendente">
+                        <i class="fa-solid fa-xmark icone-pendente"></i>
+                    </a>
+
+                {% endif %}
+                
+                    <a href="{% url 'management:tarefa_edit' tarefa.id %}" class="icone-editar"
+                    title="Editar">
+                        <i class="fa-solid fa-pencil"></i>
+                    </a>
+                
+
+                    <i class="fa-solid fa-trash icone-excluir" title="Excluir"></i>
+           
             {% endif %}
 
-            <i class="fa-solid fa-trash icone-excluir" title="Excluir"></i>
+
         </td>
+
     </tr>

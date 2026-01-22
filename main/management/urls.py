@@ -1,6 +1,6 @@
 from django.urls import path
 from management.views import *
-
+from . import views
 app_name = 'management'
 
 urlpatterns = [
@@ -23,6 +23,7 @@ urlpatterns = [
     path('colaboradores/', colaborators,  name='colaborators' ),
     path('colaboradores/create/', colaborador_create, name='colaborador_create'),
     path('colaboradores/<str:id>/editar/', colaborador_edit, name='colaborador_edit'),
+    path('colaboradores/<str:id>/status/<str:novo_status>/',colaborador_mudar_status,name='colaborador_mudar_status'),
 
     ##############################################################################
     ####################             TAREFAS        ##############################
@@ -30,6 +31,12 @@ urlpatterns = [
     path('tarefas/', tasks, name='tasks' ),
     path('tarefas/create/', tarefa_create, name='tarefa_create'),
     path('tarefas/<str:id>/editar/', tarefa_edit, name='tarefa_edit'),
+    path('tarefas/<str:tarefa_id>/status/<str:novo_status>/',alterar_status_tarefa,name='alterar_status_tarefa'),
+
+    path('relatorios/', views.relatorio_form, name='relatorio_form'),
+    path('relatorios/gerar/', views.gerar_relatorio, name='gerar_relatorio'),
+
+
 
 
 ]
