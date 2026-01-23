@@ -33,8 +33,16 @@ urlpatterns = [
     path('tarefas/<str:id>/editar/', tarefa_edit, name='tarefa_edit'),
     path('tarefas/<str:tarefa_id>/status/<str:novo_status>/',alterar_status_tarefa,name='alterar_status_tarefa'),
 
+
+    path('relatorios/menu', views.relatorio_menu, name='relatorio_menu' ),
     path('relatorios/', views.relatorio_form, name='relatorio_form'),
     path('relatorios/gerar/', views.gerar_relatorio, name='gerar_relatorio'),
+    path('relatorios/dashboard/', views.dashboard_relatorios, name='dashboard_relatorios'),
+    path('relatorios/dashboard/menu', views.dashboard_menu, name='dashboard_menu'),
+    path('relatorios/dashboard/dados/', views.dashboard_relatorios, name='dashboard_relatorios'),
+
+
+
 
 
 

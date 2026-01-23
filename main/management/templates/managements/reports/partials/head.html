@@ -40,6 +40,48 @@
         .dropdown.open .dropdown-content {
             display: block;
         }
+        .relatorios-container {
+            display: flex;
+            gap: 200px;
+            background-color: #0B1739;
+            padding: 110px;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px; 
+            margin: 0;
+        }
+
+        .relatorio-card {
+            width: 400px;     /* ⬅️ MAIS LARGURA */
+            height: 600px;    /* ⬅️ MAIS ALTURA */
+            background: linear-gradient(135deg, #0B1739, #478EEB);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #fff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .relatorio-card i {
+            font-size: 80px;  /* ⬅️ ÍCONE MAIOR */
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .relatorio-card span {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .relatorio-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+        }
+
+
 
 
     </style>

@@ -7,8 +7,18 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from .forms import *
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count
+from django.http import JsonResponse
+from django.utils.dateparse import parse_date
+from datetime import datetime
+from .models import Tarefa
 
 
+from django.http import JsonResponse
+from django.db.models import Count
+from django.utils.dateparse import parse_date
+from datetime import datetime
+import locale
 
 
 import csv
@@ -21,7 +31,21 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
 
+from reportlab.lib.units import cm
+from io import BytesIO
 
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import render
+from django.http import HttpResponse
+from .models import Tarefa, Setor, Colaborador
+from openpyxl import Workbook
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from datetime import datetime
+import csv
+import json
 
 
 
@@ -299,8 +323,15 @@ def lista_usuarios(request):
     })
 
 
+##############################################################################
+####################           RELATORIOS       ##############################
+##############################################################################
 
 
+@permission_required('management.view_tarefa', raise_exception=True)
+def relatorio_menu(request):
+
+    return render(request, 'managements/reports/pages/index.html')
 
 
 @permission_required('management.view_tarefa', raise_exception=True)
@@ -315,22 +346,10 @@ def relatorio_form(request):
     return render(request, 'managements/reports/pages/form.html', context)
 
 
-from django.contrib.auth.decorators import permission_required
-from django.shortcuts import render
-from django.http import HttpResponse
-from .models import Tarefa, Setor, Colaborador
-from openpyxl import Workbook
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from datetime import datetime
-import csv
-import json
 
 @permission_required('management.view_tarefa', raise_exception=True)
 def gerar_relatorio(request):
-    # ====== PEGAR FILTROS ======
+    tipo = request.GET.get('tipo', 'completo')  # completo | setor | colaborador
     setores = request.GET.getlist('setores')
     colaboradores = request.GET.getlist('colaboradores')
     status = request.GET.get('status')
@@ -340,69 +359,106 @@ def gerar_relatorio(request):
     data_fim = request.GET.get('data_fim')
     formato = request.GET.get('formato', 'csv')
 
-    # ====== QUERY BASE ======
-    tarefas_query = Tarefa.objects.all()
+    tarefas = Tarefa.objects.all()
 
-    # ====== APLICAR FILTROS ======
+    # ===== FILTROS =====
     if setores:
-        tarefas_query = tarefas_query.filter(setores__id__in=setores).distinct()
-    
-    if colaboradores:
-        tarefas_query = tarefas_query.filter(colaboradores__id__in=colaboradores).distinct()
-    
-    if status:
-        tarefas_query = tarefas_query.filter(status=status)
-    
-    if prioridade:
-        tarefas_query = tarefas_query.filter(prioridade=prioridade)
-    
-    if nivel_sujeira:
-        tarefas_query = tarefas_query.filter(nivel_sujeira=nivel_sujeira)
-    
-    if data_inicio:
-        tarefas_query = tarefas_query.filter(data_inicio__gte=data_inicio)
-    
-    if data_fim:
-        tarefas_query = tarefas_query.filter(data_termino__lte=data_fim)
+        tarefas = tarefas.filter(setores__id__in=setores)
 
-    tarefas = tarefas_query.prefetch_related('setores', 'colaboradores')
+    if colaboradores:
+        tarefas = tarefas.filter(colaboradores__id__in=colaboradores)
+
+    if status:
+        tarefas = tarefas.filter(status=status)
+
+    if prioridade:
+        tarefas = tarefas.filter(prioridade=prioridade)
+
+    if nivel_sujeira:
+        tarefas = tarefas.filter(nivel_sujeira=nivel_sujeira)
+
+    if data_inicio:
+        tarefas = tarefas.filter(data_inicio__gte=data_inicio)
+
+    if data_fim:
+        tarefas = tarefas.filter(data_termino__lte=data_fim)
+
+    tarefas = tarefas.prefetch_related('colaboradores')
+
+    # ===== ORDENAÇÃO =====
+    if tipo == 'colaborador':
+        tarefas = tarefas.order_by('colaboradores__nome', 'titulo').distinct()
+    elif tipo == 'setor':
+        tarefas = tarefas.order_by('setores__nome', 'titulo').distinct()
+    else:
+        tarefas = tarefas.order_by('data_inicio')
+
     total_registros = tarefas.count()
 
-    # ====== Preparar dados ======
-    cabecalho = [
-        "ID", "Tarefa", "Descrição", "Status", "Prioridade",
-        "Nível de Sujeira", "Setores", "Colaboradores",
-        "Data Início", "Data Previsão Término", "Data Término"
-    ]
-    dados = []
-    for t in tarefas:
-        setores_nome = ", ".join([s.nome for s in t.setores.all()])
-        colaboradores_nome = ", ".join([c.nome for c in t.colaboradores.all()])
-        dados.append([
-            t.id,
-            t.titulo,
-            t.descricao,
-            t.get_status_display(),
-            t.get_prioridade_display(),
-            t.get_nivel_sujeira_display(),
-            setores_nome,
-            colaboradores_nome,
-            t.data_inicio.strftime('%d/%m/%Y') if t.data_inicio else "",
-            t.data_previsao_termino.strftime('%d/%m/%Y') if t.data_previsao_termino else "",
-            t.data_termino.strftime('%d/%m/%Y') if t.data_termino else ""
-        ])
+    # ===== CABEÇALHO =====
+    if tipo == 'setor':
+        cabecalho = ["Setor", "Tarefa"]
+    elif tipo == 'colaborador':
+        cabecalho = ["Colaborador", "Tarefa"]
+    else:
+        cabecalho = ["ID", "Tarefa", "Descrição", "Status", "Prioridade", "Nível de Sujeira", "Setores", "Colaboradores", "Data Início", "Data Previsão Término", "Data Término"]
 
-    # ====== EXPORTAÇÃO ======
+    # ===== DADOS =====
+    dados = []
+
+    if tipo == 'setor':
+        for t in tarefas:
+            for s in t.setores.all():
+                dados.append([
+                    s.nome,
+                    t.titulo  # ou f"{t.id} - {t.titulo}" se quiser ID
+                ])
+    elif tipo == 'colaborador':
+        for t in tarefas:
+            for c in t.colaboradores.all():
+                dados.append([
+                    c.nome,
+                    t.titulo  # ou f"{t.id} - {t.titulo}"
+                ])
+    else:
+        for t in tarefas:
+            setores_nome = ", ".join([s.nome for s in t.setores.all()])
+            colaboradores_nome = ", ".join([c.nome for c in t.colaboradores.all()])
+            dados.append([
+                t.id,
+                t.titulo,
+                t.descricao,
+                t.get_status_display(),
+                t.get_prioridade_display(),
+                t.get_nivel_sujeira_display(),
+                setores_nome,
+                colaboradores_nome,
+                t.data_inicio.strftime('%d/%m/%Y') if t.data_inicio else "",
+                t.data_previsao_termino.strftime('%d/%m/%Y') if t.data_previsao_termino else "",
+                t.data_termino.strftime('%d/%m/%Y') if t.data_termino else ""
+            ])
+
+
+
+
+    # =============================== 
+    # EXPORTAÇÕES (CSV, XLSX, JSON, PDF)
+    # ===============================
+    # (mesma lógica que você já tinha, usando cabecalho e dados)
+
+    # Exemplo CSV
     if formato == 'csv':
         response = HttpResponse(content_type='text/csv; charset=utf-8')
-        response['Content-Disposition'] = f'attachment; filename="relatorio_tarefas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-        response.write('\ufeff')  # BOM para Excel
+        response['Content-Disposition'] = (
+            f'attachment; filename="relatorio_tarefas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+        )
+        response.write('\ufeff')
         writer = csv.writer(response, delimiter=';')
         writer.writerow(cabecalho)
-        for linha in dados:
-            writer.writerow(linha)
+        writer.writerows(dados)
         return response
 
+    # XLSX
     elif formato == 'xlsx':
         wb = Workbook()
         ws = wb.active
@@ -413,10 +469,13 @@ def gerar_relatorio(request):
         response = HttpResponse(
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = f'attachment; filename="relatorio_tarefas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        response['Content-Disposition'] = (
+            f'attachment; filename="relatorio_tarefas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        )
         wb.save(response)
         return response
 
+    # JSON
     elif formato == 'json':
         lista = []
         for t in tarefas:
@@ -429,17 +488,128 @@ def gerar_relatorio(request):
                 "nivel_sujeira": t.get_nivel_sujeira_display(),
                 "setores": [s.nome for s in t.setores.all()],
                 "colaboradores": [c.nome for c in t.colaboradores.all()],
-                "data_inicio": t.data_inicio.strftime('%d/%m/%Y') if t.data_inicio else "",
-                "data_previsao_termino": t.data_previsao_termino.strftime('%d/%m/%Y') if t.data_previsao_termino else "",
-                "data_termino": t.data_termino.strftime('%d/%m/%Y') if t.data_termino else ""
             })
-        return HttpResponse(json.dumps(lista, indent=4, ensure_ascii=False), content_type="application/json; charset=utf-8")
+        return HttpResponse(
+            json.dumps(lista, ensure_ascii=False, indent=4),
+            content_type="application/json; charset=utf-8"
+        )
 
-    # Render template
-    context = {
+    # PDF
+    elif formato == 'pdf':
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=landscape(A4),
+            rightMargin=1*cm,
+            leftMargin=1*cm,
+            topMargin=1*cm,
+            bottomMargin=1*cm
+        )
+        tabela = Table([cabecalho] + dados, repeatRows=1)
+        tabela.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.grey),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,-1), 7),
+            ('GRID', (0,0), (-1,-1), 0.25, colors.black),
+        ]))
+        doc.build([tabela])
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = (
+            f'attachment; filename="relatorio_tarefas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+        )
+        return response
+
+    # ====== RENDER TEMPLATE ======
+    return render(request, 'managements/reports/pages/form.html', {
         'tarefas': tarefas,
         'setores': Setor.objects.all(),
         'colaboradores': Colaborador.objects.all(),
         'total_registros': total_registros
+    })
+
+
+
+
+
+def dashboard_relatorios(request):
+    tipo = request.GET.get('tipo', 'setor')
+
+    setores = request.GET.getlist('setores')
+    colaboradores = request.GET.getlist('colaboradores')
+    status = request.GET.get('status')
+    prioridade = request.GET.get('prioridade')
+    nivel_sujeira = request.GET.get('nivel_sujeira')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+
+    tarefas = Tarefa.objects.all()
+
+    if setores:
+        tarefas = tarefas.filter(setores__id__in=setores)
+
+    if colaboradores:
+        tarefas = tarefas.filter(colaboradores__id__in=colaboradores)
+
+    if status:
+        tarefas = tarefas.filter(status=status)
+
+    if prioridade:
+        tarefas = tarefas.filter(prioridade=prioridade)
+
+    if nivel_sujeira:
+        tarefas = tarefas.filter(nivel_sujeira=nivel_sujeira)
+
+    if data_inicio:
+        tarefas = tarefas.filter(data_inicio__gte=parse_date(data_inicio))
+
+    if data_fim:
+        tarefas = tarefas.filter(data_termino__lte=parse_date(data_fim))
+
+    # ===== AGRUPAMENTO =====
+    if tipo == 'setor':
+        dados = tarefas.values('setores__nome').annotate(total=Count('id'))
+        labels = [d['setores__nome'] for d in dados]
+        titulo_tipo = 'Atividades por Setor'
+    else:
+        dados = tarefas.values('colaboradores__nome').annotate(total=Count('id'))
+        labels = [d['colaboradores__nome'] for d in dados]
+        titulo_tipo = 'Atividades por Colaborador'
+
+    valores = [d['total'] for d in dados]
+
+    # ===== MÊS EM PT-BR =====
+    try:
+        locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+    except:
+        locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
+
+    if data_inicio:
+        data_ref = parse_date(data_inicio)
+    else:
+        data_ref = datetime.now().date()
+
+    mes_pt = data_ref.strftime('%B').capitalize()
+    mes_final = f'{mes_pt} / {data_ref.year}'
+
+    return JsonResponse({
+        'labels': labels,
+        'valores': valores,
+        'mes': mes_final,
+        'titulo_tipo': titulo_tipo
+    })
+
+@permission_required('management.view_tarefa', raise_exception=True)
+def dashboard_menu(request):
+    context = {
+        'setores': Setor.objects.all(),
+        'colaboradores': Colaborador.objects.all(),
     }
-    return render(request, 'managements/reports/pages/form.html', context)
+    return render(
+        request,
+        'managements/reports/pages/dashboard.html',
+        context
+    )
+

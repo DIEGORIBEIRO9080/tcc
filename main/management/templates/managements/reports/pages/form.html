@@ -1,173 +1,167 @@
 {% include 'managements/reports/partials/head.html' %}
-
-
-
 {% include 'managements/sectors/partials/head.html' %}
-    <body>
-        {% include 'global/partials/sidebar.html' %}
-         
-        <!-- Grid 2 -->
-        <div class="content">
-            {% include 'global/partials/header.html' %}
 
-            <div class="table-wrapper">
+<body>
+    {% include 'global/partials/sidebar.html' %}
 
-                {% if messages %}
-                    <div class="messages">
-                        {% for message in messages %}
-                            <div class="alert {{ message.tags }}">
-                                {{ message }}
-                            </div>
+    <div class="content">
+        {% include 'global/partials/header.html' %}
+
+        <div class="table-wrapper">
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="get" action="{% url 'management:gerar_relatorio' %}">
+
+                <!-- ===================== -->
+                <!-- TIPO DE RELATÓRIO -->
+                <!-- ===================== -->
+                <h3>Tipo de relatório</h3>
+                <div class="dropdown" id="tipoRelatorioDropdown">
+                    <div class="dropdown-btn" id="tipoRelatorioBtn" onclick="toggleDropdown('tipoRelatorioDropdown')">
+                        Selecionar tipo de relatório
+                    </div>
+                    <div class="dropdown-content">
+                        <label onclick="selecionarTipo(this)">
+                            <input type="radio" name="tipo" value="completo" required>
+                            Todos
+                        </label>
+                        <label onclick="selecionarTipo(this)">
+                            <input type="radio" name="tipo" value="setor">
+                            Por setor
+                        </label>
+                        <label onclick="selecionarTipo(this)">
+                            <input type="radio" name="tipo" value="colaborador">
+                            Por colaborador
+                        </label>
+                    </div>
+                </div>
+                <br><br>
+
+                <!-- ===================== -->
+                <!-- SETORES -->
+                <!-- ===================== -->
+                <div class="dropdown" id="setoresDropdown">
+                    <div class="dropdown-btn" onclick="toggleDropdown('setoresDropdown')">
+                        Selecionar setores
+                    </div>
+                    <div class="dropdown-content">
+                        {% for setor in setores %}
+                            <label>
+                                <input type="checkbox" name="setores" value="{{ setor.id }}">
+                                {{ setor.nome }}
+                            </label>
                         {% endfor %}
                     </div>
-                {% endif %}
+                </div>
+                <br><br>
 
-
-                <form method="get" action="{% url 'management:gerar_relatorio' %}">
-
-
-                    <h2>Relatórios de Tarefas</h2>
-
-                    <!-- ===================== -->
-                    <!-- TIPO DE RELATÓRIO -->
-                    <!-- ===================== -->
-                    <h3>Tipo de relatório</h3>
-                    <select name="tipo">
-                        <option value="completo">Todos</option>
-                        <option value="setor">Por setor</option>
-                        <option value="colaborador">Por colaborador</option>
-                        
-                    </select>
-                    <br><br>
-
-
-                    <!-- ===================== -->
-                    <!-- SETORES -->
-                    <!-- ===================== -->
-                   
-
-                    {% load static %}
-                    <link rel="stylesheet" href="{% static 'css/relatorios.css' %}">
-
-                    <div class="dropdown" id="setoresDropdown">
-                        <div class="dropdown-btn" onclick="toggleDropdown('setoresDropdown')">
-                            Selecionar setores
-                        </div>
-
-                        <div class="dropdown-content">
-                            {% for setor in setores %}
-                                <label>
-                                    <input type="checkbox" name="setores" value="{{ setor.id }}">
-                                    {{ setor.nome }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                <!-- ===================== -->
+                <!-- COLABORADORES -->
+                <!-- ===================== -->
+                <div class="dropdown" id="colaboradoresDropdown">
+                    <div class="dropdown-btn" onclick="toggleDropdown('colaboradoresDropdown')">
+                        Selecionar colaboradores
                     </div>
-                    <br><br>
-
-
-
-
-
-
-
-
-
-                    <!-- ===================== -->
-                    <!-- COLABORADORES -->
-                    <!-- ===================== -->
-                    <div class="dropdown" id="colaboradoresDropdown">
-                        <div class="dropdown-btn" onclick="toggleDropdown('colaboradoresDropdown')">
-                            Selecionar colaboradores
-                        </div>
-
-                        <div class="dropdown-content">
-                            {% for colaborador in colaboradores %}
-                                <label>
-                                    <input type="checkbox" name="colaboradores" value="{{ colaborador.id }}">
-                                    {{ colaborador.nome }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                    <div class="dropdown-content">
+                        {% for colaborador in colaboradores %}
+                            <label>
+                                <input type="checkbox" name="colaboradores" value="{{ colaborador.id }}">
+                                {{ colaborador.nome }}
+                            </label>
+                        {% endfor %}
                     </div>
-                    <br><br>
+                </div>
+                <br><br>
 
+                <!-- ===================== -->
+                <!-- STATUS -->
+                <!-- ===================== -->
+                <h3>Status</h3>
+                <select name="status">
+                    <option value="">Todos</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="em_andamento">Em andamento</option>
+                    <option value="concluida">Concluída</option>
+                </select>
+                <br><br>
 
-                    <!-- ===================== -->
-                    <!-- STATUS -->
-                    <!-- ===================== -->
-                    <h3>Status</h3>
-                    <select name="status">
-                        <option value="">Todos</option>
-                        <option value="pendente">Pendente</option>
-                        <option value="em_andamento">Em andamento</option>
-                        <option value="concluida">Concluída</option>
-                    </select>
+                <!-- ===================== -->
+                <!-- PRIORIDADE -->
+                <!-- ===================== -->
+                <h3>Prioridade</h3>
+                <select name="prioridade">
+                    <option value="">Todas</option>
+                    <option value="baixa">Baixa</option>
+                    <option value="media">Média</option>
+                    <option value="alta">Alta</option>
+                </select>
+                <br><br>
 
-                    <!-- ===================== -->
-                    <!-- PRIORIDADE -->
-                    <!-- ===================== -->
-                    <h3>Prioridade</h3>
-                    <select name="prioridade">
-                        <option value="">Todas</option>
-                        <option value="baixa">Baixa</option>
-                        <option value="media">Média</option>
-                        <option value="alta">Alta</option>
-                    </select>
+                <!-- ===================== -->
+                <!-- NÍVEL DE SUJEIRA -->
+                <!-- ===================== -->
+                <h3>Nível de sujeira</h3>
+                <select name="nivel_sujeira">
+                    <option value="">Todos</option>
+                    <option value="baixo">Baixo</option>
+                    <option value="medio">Médio</option>
+                    <option value="alto">Alto</option>
+                </select>
+                <br><br>
 
-                    <!-- ===================== -->
-                    <!-- NÍVEL DE SUJEIRA -->
-                    <!-- ===================== -->
-                    <h3>Nível de sujeira</h3>
-                    <select name="nivel_sujeira">
-                        <option value="">Todos</option>
-                        <option value="baixo">Baixo</option>
-                        <option value="medio">Médio</option>
-                        <option value="alto">Alto</option>
-                    </select>
+                <!-- ===================== -->
+                <!-- PERÍODO -->
+                <!-- ===================== -->
+                <h3>Período</h3>
+                <label>Data início:</label>
+                <input type="date" name="data_inicio">
 
-                    <!-- ===================== -->
-                    <!-- PERÍODO -->
-                    <!-- ===================== -->
-                    <h3>Período</h3>
-                    <label>Data início:</label>
-                    <input type="date" name="data_inicio">
+                <label>Data término:</label>
+                <input type="date" name="data_fim">
+                <br><br>
 
-                    <label>Data término:</label>
-                    <input type="date" name="data_fim">
+                <!-- ===================== -->
+                <!-- FORMATO -->
+                <!-- ===================== -->
+                <h3>Formato do arquivo</h3>
+                <select name="formato" required>
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel</option>
+                    <option value="pdf">PDF</option>
+                    <option value="json">JSON</option>
+                </select>
+                <br><br>
 
-                    
-
-
-
-
-                    <!-- ===================== -->
-                    <!-- FORMATO -->
-                    <!-- ===================== -->
-                    <h3>Formato do arquivo</h3>
-                    <select name="formato" required>
-                        <option value="csv">CSV</option>
-                        <option value="xlsx">Excel</option>
-                        <option value="pdf">PDF</option>
-                        <option value="json">JSON</option>
-                    </select>
-                    <br><br>
-                    <br><br>
-
-                    <button type="submit">Gerar relatório</button>
-                </form>
-            </div>
-
-
-                {% include 'global/partials/footer.html' %}
+                <button type="submit">Gerar relatório</button>
+            </form>
         </div>
 
-        <script>
+        {% include 'global/partials/footer.html' %}
+    </div>
+
+    <!-- ===================== -->
+    <!-- SCRIPTS -->
+    <!-- ===================== -->
+    <script>
         function toggleDropdown(id) {
             document.getElementById(id).classList.toggle('open');
         }
-        </script>
 
-    
-    </body>
+        function selecionarTipo(label) {
+            const radio = label.querySelector('input[type="radio"]');
+            radio.checked = true; // marca o radio
+            document.getElementById('tipoRelatorioBtn').innerText = label.innerText.trim();
+            toggleDropdown('tipoRelatorioDropdown');
+        }
+    </script>
+</body>
 </html>

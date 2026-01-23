@@ -1,0 +1,203 @@
+{% include 'managements/reports/partials/head.html' %}
+{% include 'managements/sectors/partials/head.html' %}
+
+<body>
+    {% include 'global/partials/sidebar.html' %}
+
+    <div class="content">
+    {% include 'global/partials/header.html' %}
+
+    <div class="table-wrapper">
+
+    <h2>Dashboard de Relatórios</h2>
+
+    <form id="form-dashboard">
+
+        <h3>Tipo de gráfico</h3>
+        <select name="tipo">
+            <option value="setor">Tarefas por setor</option>
+            <option value="colaborador">Tarefas por colaborador</option>
+        </select>
+
+        <br><br>
+
+        <!-- SETORES -->
+        <div class="dropdown" id="setoresDropdown">
+            <div class="dropdown-btn" onclick="toggleDropdown('setoresDropdown')">
+                Selecionar setores
+            </div>
+            <div class="dropdown-content">
+                {% for setor in setores %}
+                <label>
+                    <input type="checkbox" name="setores" value="{{ setor.id }}">
+                    {{ setor.nome }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <br><br>
+
+        <!-- COLABORADORES -->
+        <div class="dropdown" id="colaboradoresDropdown">
+            <div class="dropdown-btn" onclick="toggleDropdown('colaboradoresDropdown')">
+                Selecionar colaboradores
+            </div>
+            <div class="dropdown-content">
+                {% for colaborador in colaboradores %}
+                <label>
+                    <input type="checkbox" name="colaboradores" value="{{ colaborador.id }}">
+                    {{ colaborador.nome }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <br><br>
+
+        <h3>Status</h3>
+        <select name="status">
+            <option value="">Todos</option>
+            <option value="pendente">Pendente</option>
+            <option value="em_andamento">Em andamento</option>
+            <option value="concluida">Concluída</option>
+        </select>
+
+        <h3>Prioridade</h3>
+        <select name="prioridade">
+            <option value="">Todas</option>
+            <option value="baixa">Baixa</option>
+            <option value="media">Média</option>
+            <option value="alta">Alta</option>
+        </select>
+
+        <h3>Nível de sujeira</h3>
+        <select name="nivel_sujeira">
+            <option value="">Todos</option>
+            <option value="baixo">Baixo</option>
+            <option value="medio">Médio</option>
+            <option value="alto">Alto</option>
+        </select>
+
+        <h3>Período</h3>
+        <label>Data início</label>
+        <input type="date" name="data_inicio">
+
+        <label>Data término</label>
+        <input type="date" name="data_fim">
+
+        <br><br>
+
+        <h3>Exportar</h3>
+
+        <!-- RADIO (APENAS UMA OPÇÃO) -->
+        <label>
+            <input type="radio" name="exportar" value="png">
+            PNG
+        </label>
+
+        <label>
+            <input type="radio" name="exportar" value="pdf">
+            PDF
+        </label>
+
+        <br><br>
+
+        <button type="button" onclick="gerarExportacao()">
+            Gerar relatório
+        </button>
+    </form>
+
+    <!-- GRÁFICO OCULTO -->
+    <div style="display:none;">
+        <canvas id="graficoDashboard" width="900" height="450"></canvas>
+    </div>
+
+    </div>
+
+    {% include 'global/partials/footer.html' %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+    let chart = null;
+
+    function toggleDropdown(id) {
+        document.getElementById(id).classList.toggle('open');
+    }
+
+    function gerarExportacao() {
+
+        const exportar = document.querySelector('input[name="exportar"]:checked');
+
+        if (!exportar) {
+            alert('Escolha PNG ou PDF');
+            return;
+        }
+
+        const form = document.getElementById('form-dashboard');
+        const params = new URLSearchParams(new FormData(form)).toString();
+
+        fetch(`/relatorios/dashboard/?${params}`)
+            .then(res => res.json())
+            .then(data => {
+
+                const ctx = document.getElementById('graficoDashboard');
+
+                if (chart) chart.destroy();
+
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.valores,
+                            backgroundColor: '#5DA9E9'
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: `${data.titulo_tipo} - ${data.mes}`,
+                                font: { size: 18 }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                setTimeout(() => {
+                    if (exportar.value === 'png') exportarPNG();
+                    if (exportar.value === 'pdf') exportarPDF();
+                }, 300);
+            });
+    }
+
+    function exportarPNG() {
+        const canvas = document.getElementById('graficoDashboard');
+        const link = document.createElement('a');
+        link.download = 'dashboard_relatorio.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    function exportarPDF() {
+        const canvas = document.getElementById('graficoDashboard');
+        const img = canvas.toDataURL('image/png');
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('landscape');
+        pdf.addImage(img, 'PNG', 10, 10, 270, 150);
+        pdf.save('dashboard_relatorio.pdf');
+    }
+    </script>
+
+    </body>
+</html>
