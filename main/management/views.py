@@ -613,3 +613,52 @@ def dashboard_menu(request):
         context
     )
 
+##############################################################################
+####################          NOTIFICAÇÃO       ##############################
+##############################################################################
+
+
+from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
+from .models import Tarefa
+
+
+def notificacoes_tarefas(request):
+    agora = timezone.now()
+    notificacoes = []
+
+    tarefas = Tarefa.objects.filter(
+        status__in=['pendente', 'em_andamento']
+    )
+
+    alertas = [30, 20, 10, 5, 1]
+
+    for tarefa in tarefas:
+        diferenca = tarefa.data_previsao_termino - agora
+        minutos = int(diferenca.total_seconds() // 60)
+
+        # ATRASADA
+        if minutos < 0:
+            notificacoes.append({
+                "tarefa": tarefa.titulo,
+                "status": "Atrasada",
+                "tempo": f"Atrasada há {abs(minutos)} min",
+                "tipo": "atrasada"
+            })
+
+        # PRÓXIMA DO PRAZO
+        elif minutos in alertas:
+            notificacoes.append({
+                "tarefa": tarefa.titulo,
+                "status": "Próxima do prazo",
+                "tempo": f"Faltam {minutos} min",
+                "tipo": "alerta"
+            })
+
+    return JsonResponse({
+        "total": len(notificacoes),
+        "notificacoes": notificacoes
+    })
+
+

@@ -1,8 +1,18 @@
-<div class="footer">
-    <div class="By">
-        By Diego Ribeiro
+{% load static %}
+
+    <div class="footer">
+        <div class="By">
+            By Diego Ribeiro
+        </div>
+        <div class="powered">
+            Powered by Django
+        </div>
     </div>
-    <div class="powered">
-        Powered by Django
-    </div>
-</div>
+
+
+
+{% include "global/partials/modal_notificacoes.html" %}
+
+<script src="{% static 'global/js/notificacoes.js' %}"></script>
+
+

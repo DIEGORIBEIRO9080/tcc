@@ -41,6 +41,10 @@ urlpatterns = [
     path('relatorios/dashboard/menu', views.dashboard_menu, name='dashboard_menu'),
     path('relatorios/dashboard/dados/', views.dashboard_relatorios, name='dashboard_relatorios'),
 
+    path('notificacoes/', notificacoes_tarefas, name='notificacoes_tarefas'),
+
+
+
 
 
 
