@@ -26,24 +26,57 @@
 
 
 
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" class="colaborador-form">
                     {% csrf_token %}
 
-                    {% for field in form %}
-                        <div>
-                            <label>{{ field.label }}</label>
-                            {{ field }}
-                            {{ field.errors }}
+                    <div class="form-group">
+                        <label>{{ form.nome.label }}</label>
+                        {{ form.nome }}
+                        {{ form.nome.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ form.imagem.label }}</label>
+                        {{ form.imagem }}
+                        {{ form.imagem.errors }}
+                    </div>
+
+                    <!-- LINHA 1 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>{{ form.status.label }}</label>
+                            {{ form.status }}
+                            {{ form.status.errors }}
                         </div>
-                    {% endfor %}
 
-                    <button type="submit">Salvar</button>
+                        <div class="form-group">
+                            <label>{{ form.data_admissao.label }}</label>
+                            {{ form.data_admissao }}
+                            {{ form.data_admissao.errors }}
+                        </div>
+                    </div>
+
+                    <!-- LINHA 2 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>{{ form.telefone.label }}</label>
+                            {{ form.telefone }}
+                            {{ form.telefone.errors }}
+                        </div>
+
+                        <div class="form-group">
+                            <label>{{ form.numero_empresa.label }}</label>
+                            {{ form.numero_empresa }}
+                            {{ form.numero_empresa.errors }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-salvar">Salvar</button>
                 </form>
-            </div>
 
 
-                {% include 'global/partials/footer.html' %}
+           
         </div>
-
+        {% include 'global/partials/footer.html' %}
     </body>
 </html>

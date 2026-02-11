@@ -1,0 +1,41 @@
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <h2>Configurações</h2>
+
+
+
+
+        <!-- CONFIGURAÇÕES DO SISTEMA -->
+        <div>
+            <label>Email Institucional</label>
+            <input type="email" name="email_institucional" value="{{ config.email_institucional|default_if_none:'' }}">
+        </div>
+
+        <div>
+            <label>Telefone</label>
+            <input type="text" name="telefone" value="{{ config.telefone|default_if_none:'' }}">
+        </div>
+
+        <div>
+            <label>Endereço</label>
+            <input type="text" name="endereco" value="{{ config.endereco|default_if_none:'' }}">
+        </div>
+
+        <br>
+
+        <button type="submit">Salvar Configurações</button>
+    </form>

@@ -7,9 +7,23 @@
             <li><a href="/setores">setores</a></li>
             <li><a href="/colaboradores">colaboradores</a></li>
             <li><a href="/tarefas">tarefas</a></li>
-            <li><a href="/tarefas">relatorios</a></li>
+            <li>
+                <a href="/relatorios/menu">Relatórios</a>
+            </li>
+
+
             <br><hr><br>
             <li><a href="/tarefas">configurações</a></li>
             <li><a href="/usuarios">perfil</a></li>
+
+            <br><br><br><br><br><br><br><br><br><br><br><br><br>
+            
+
+            <li>    
+                {% if user.is_authenticated %}
+                    <a href="{% url 'authors:logout' %}" class="btn-logout">Sair</a>
+                {% endif %}
+            </li>
+
         </ul>
     </div>

@@ -33,6 +33,20 @@
                 </a>
             {% endif %}
 
-            <i class="fa-solid fa-trash"></i>
+            {% if perms.management.delete_setor %}
+                <form action="{% url 'management:setor_delete' setor.id %}" method="POST"
+                    class="form-delete"
+                    onsubmit="return confirm('Você deseja realmente excluir este setor?');">
+
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn-icon delete-btn" title="Excluir setor">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+
+            {% endif %}
+
+            
         </td>
     </tr>

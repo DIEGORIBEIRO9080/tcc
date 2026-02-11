@@ -80,3 +80,14 @@ class TarefaForm(forms.ModelForm):
             'data_termino'
         ]:
             self.fields[field].input_formats = ['%Y-%m-%dT%H:%M']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+
+        status = cleaned_data.get("status")
+        data_termino = cleaned_data.get("data_termino")
+
+        if status == "concluida" and not data_termino:
+            self.add_error("data_termino", "Se a tarefa estiver concluída, a data de término é obrigatória.")
+
+        return cleaned_data

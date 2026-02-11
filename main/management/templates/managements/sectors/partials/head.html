@@ -86,6 +86,135 @@
             color: white;
             cursor: pointer;
         }
+        h3{
+            text-align:center;
+            color: #ffffff;
+            padding-bottom:0;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                /* Centralizar formulário na página */
+        .setor-form {
+            background-color: #0B1739;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 700px;
+            margin: 30px auto; /* CENTRALIZA */
+        }
+
+        /* Linhas com dois campos */
+        .setor-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Grupos */
+        .setor-form .form-group {
+            margin-bottom: 16px;
+        }
+
+        /* Labels */
+        .setor-form label {
+            display: block;
+            margin-bottom: 6px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Inputs */
+        .setor-form input,
+        .setor-form select,
+        .setor-form textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+        }
+
+        /* Foco */
+        .setor-form input:focus,
+        .setor-form select:focus,
+        .setor-form textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+        }
+
+        /* Botão */
+        .setor-form .btn-salvar {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #ffffff;
+            color: #0B1739;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .setor-form .btn-salvar:hover {
+            background-color: #121f4a;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .setor-form .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* BOTÃO EXCLUIR (ICONE LIXEIRA) */
+        .btn-icon.delete-btn {
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            cursor: pointer;
+            outline: none !important;
+            box-shadow: none !important;
+            text-decoration: none !important;
+
+            /* aumenta +4px */
+            font-size: 18px;
+        }
+
+        /* remove linha branca embaixo do ícone */
+        .btn-icon.delete-btn i {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            display: inline-block;
+
+            /* aumenta o tamanho real do ícone */
+            font-size: 18px;
+        }
+        .edit{
+            text-decoration: none !important;
+        }
+
+        
+
+        /* tira qualquer estilo do form */
+        .form-delete {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
 
         
     </style>

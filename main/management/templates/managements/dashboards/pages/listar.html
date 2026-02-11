@@ -1,56 +1,239 @@
 {% include 'managements/dashboards/partials/head.html' %}
     <body>
-        <div class="sidebar">
-            <h2>Sidebar</h2>
-            <ul>
-                <li><a href="/"></a>Dashboard</li>
-                <li><a href="/setores">setores</a></li>
-                <li><a href="/colaboradores">colaboradores</a></li>
-                <li><a href="/tarefas">tarefas</a></li>
-                <li><a href="/tarefas">relatorios</a></li>
-
-                <br><hr><br>
-
-                <li><a href="/tarefas">configurações</a></li>
-                <li><a href="/tarefas">perfil</a></li>
-            </ul>
-        </div>
-  <!-- Fim da sidebar -->
-
-  <!-- Início do conteúdo principal -->
+        {% include 'global/partials/sidebar.html' %}
+         
+        <!-- Grid 2 -->
         <div class="content">
+            {% include 'global/partials/header.html' %}
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <div class="dashboard">
 
-                <!-- 1. HEADER -->
-                <div class="header">
-                    <h1>Conteúdo Principal</h1>
+                <!-- 2. TOP: 4 quadrados -->
+                <div class="top">
+
+                    
+
+                    <div class="square">
+                        <div class="square-text">
+                            <h2>{{ total_colaboradores }}</h2>
+                            <p>Total de colaboradores</p>
+                        </div>
+
+                        <div class="icone"><i class="fa-solid fa-users"></i></div>
+
+                    </div>
+
+
+                    <div class="square">
+
+                        <div class="square-text">
+                                <h2>{{ tarefas_concluidas }}</h2>
+                                <p>Tarefas concluídas</p>
+                        </div>
+                        <div class="icone"><i class="fa-solid fa-rocket"></i></div>
+                    </div>
+
+
+                    <div class="square">
+
+                        <div class="square-text">
+                            <h2>{{ total_setores }}</h2>
+                            <p>Total de setores</p>
+                        </div>
+
+                        <div class="icone"><i class="fa-solid fa-building"></i></div>
+                    </div>
+
+                    <div class="square">
+                    
+                        <div class="square-text">
+                            <h2>{{ tarefas_pendentes }}</h2>
+                            <p>Tarefas pendentes</p>
+                            
+                            
+                        </div>
+                        <div class="icone"><i class="fa-solid fa-file"></i></div>
+                    </div>
+ 
                     
                 </div>
 
-                <!-- 2. TOP: 4 quadrados -->
-                <div class="top">
-                    <div class="square"></div>
-                    <div class="square"></div>
-                    <div class="square"></div>
-                    <div class="square"></div>
-                </div>
-
                 <!-- 3. MIDDLE: gráfico grande -->
-                <div class="middle"></div>
+                <div class="middle">
+                    <h3 class="graph-title">Tarefas por mês ({{ ano_atual }})</h3>
+                    <canvas id="graficoMensal"></canvas>
+                </div>
 
                 <!-- 4. BOTTOM: dois gráficos -->
                 <div class="bottom">
-                    <div class="small-graph"></div>
-                    <div class="small-graph"></div>
+
+                    <div class="small-graph">
+                        <h3 class="graph-title">Tarefas por colaborador</h3>
+                        <canvas id="graficoColaborador"></canvas>
+                    </div>
+
+                    <div class="small-graph">
+                        <h3 class="graph-title">Tarefas por setor</h3>
+                        <canvas id="graficoSetor"></canvas>
+                    </div>
+
                 </div>
 
-                <!-- 5. FOOTER -->
-                <div class="footer">
-                    <p>Rodapé do dashboard</p>
-                </div>
             </div>
-        </div>
-    </body>
 
+
+
+        {% include 'global/partials/footer.html' %}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            // =============================
+            // GRÁFICO 1 - POR MÊS
+            // =============================
+            const dadosMensais = {{ tarefas_mes|safe }};
+
+            new Chart(document.getElementById("graficoMensal"), {
+                type: "bar",
+                data: {
+                    labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+                    datasets: [{
+                        label: "Tarefas",
+                        data: dadosMensais,
+                        backgroundColor: "#00d4ff",
+                        borderRadius: 8,
+
+                        barThickness: 40,       // largura fixa (afina ou engorda)
+                        maxBarThickness: 45,    // limite máximo
+                        categoryPercentage: 0.5, // espaço entre grupos
+                        barPercentage: 0.5       // espaço entre colunas
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: "#ffffff" } },
+                        y: { ticks: { color: "#ffffff" } }
+                    }
+                }
+            });
+
+
+
+            // -----------------------
+            // GRÁFICO COLABORADOR
+            // -----------------------
+            const labelsColaboradores = {{ labels_colaboradores|safe }};
+            const dadosColaboradores = {{ dados_colaboradores|safe }};
+
+            // Calcula maior valor e stepSize mínimo
+            const maxColaborador = Math.max(...dadosColaboradores);
+            const minTicks = 4;
+            const stepSizeColaborador = Math.ceil(maxColaborador / (minTicks - 1));
+            const maxEixoColaborador = Math.ceil(maxColaborador / stepSizeColaborador) * stepSizeColaborador;
+
+            new Chart(document.getElementById("graficoColaborador"), {
+                type: "line",
+                data: {
+                    labels: labelsColaboradores,
+                    datasets: [{
+                        label: "Tarefas",
+                        data: dadosColaboradores,
+                        borderColor: "#00d4ff",
+                        backgroundColor: "rgba(0, 212, 255, 0.2)",
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { 
+                            ticks: { 
+                                color: "#ffffff",
+                                font: { size: 12 } 
+                            } 
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            min: 0,
+                            max: maxEixoColaborador,
+                            ticks: {
+                                stepSize: stepSizeColaborador,
+                                color: "#ffffff",
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+
+
+            // -----------------------
+            // GRÁFICO SETOR
+            // -----------------------
+            const labelsSetores = {{ labels_setores|safe }};
+            const dadosSetores = {{ dados_setores|safe }};
+
+            // Calcula maior valor e stepSize mínimo
+            const maxSetor = Math.max(...dadosSetores);
+            const stepSizeSetor = Math.ceil(maxSetor / (minTicks - 1));
+            const maxEixoSetor = Math.ceil(maxSetor / stepSizeSetor) * stepSizeSetor;
+
+            new Chart(document.getElementById("graficoSetor"), {
+                type: "line",
+                data: {
+                    labels: labelsSetores,
+                    datasets: [{
+                        label: "Tarefas",
+                        data: dadosSetores,
+                        borderColor: "#00d4ff",
+                        backgroundColor: "rgba(0, 212, 255, 0.2)",
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { 
+                            ticks: { 
+                                color: "#ffffff",
+                                font: { size: 12 } 
+                            } 
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            min: 0,
+                            max: maxEixoSetor,
+                            ticks: {
+                                stepSize: stepSizeSetor,
+                                color: "#ffffff",
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+
+
+        </script>
+
+
+    </body>
 </html>

@@ -64,7 +64,20 @@
                     </a>
                 
 
-                    <i class="fa-solid fa-trash icone-excluir" title="Excluir"></i>
+                    {% if perms.management.delete_tarefa %}
+                        <form action="{% url 'management:tarefa_delete' tarefa.id %}"
+                            method="POST"
+                            style="display:inline;"
+                            onsubmit="return confirm('Você deseja realmente excluir esta tarefa?');">
+
+                            {% csrf_token %}
+
+                            <button type="submit" class="btn-icon delete" title="Excluir tarefa">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+
            
             {% endif %}
 

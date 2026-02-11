@@ -54,11 +54,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'main.urls'
 
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],  # templates globais
+        'APP_DIRS': True,                   # <--- fundamental para encontrar templates dentro dos apps
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -138,3 +141,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/usuarios/login/'
+LOGIN_REDIRECT_URL = '/relatorios/dashboard/'
+

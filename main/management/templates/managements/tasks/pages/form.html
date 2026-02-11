@@ -1,47 +1,180 @@
 {% include 'managements/tasks/partials/head.html' %}
-    <body>
-        {% include 'global/partials/sidebar.html' %}
-         
-        <!-- Grid 2 -->
-        <div class="content">
-            {% include 'global/partials/header.html' %}
+{% include 'managements/sectors/partials/head.html' %}
 
-            <div class="table-wrapper">
-                <h2>
-                    {% if setor %}
-                        Editar Tarefa
-                    {% else %}
-                        Cadastrar Tarefa
-                    {% endif %}
-                </h2>
-                {% if messages %}
-                    <div class="messages">
-                        {% for message in messages %}
-                            <div class="alert {{ message.tags }}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+<body>
+    {% include 'global/partials/sidebar.html' %}
 
-
-
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    {% for field in form %}
-                        <div>
-                            <label>{{ field.label }}</label>
-                            {{ field }}
-                            {{ field.errors }}
+    <div class="content">
+        {% include 'global/partials/header.html' %}
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }}">
+                            {{ message }}
                         </div>
                     {% endfor %}
+                </div>
+            {% endif %}
+        <div class="table-wrapper">
 
-                    <button type="submit">Salvar</button>
-                </form>
+
+
+            <form method="post" class="tarefa-form">
+                {% csrf_token %}
+
+                <h2 style="color:white; text-align:center; margin-bottom:20px;">
+                    Cadastro de Tarefa
+                </h2>
+
+                <!-- ===================== -->
+                <!-- TÍTULO -->
+                <!-- ===================== -->
+                <div class="form-group">
+                    <label>Título</label>
+                    {{ form.titulo }}
+                </div>
+
+                <!-- ===================== -->
+                <!-- DESCRIÇÃO -->
+                <!-- ===================== -->
+                <div class="form-group">
+                    <label>Descrição</label>
+                    {{ form.descricao }}
+                </div>
+
+                <!-- ===================== -->
+                <!-- STATUS E PRIORIDADE -->
+                <!-- ===================== -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        {{ form.status }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prioridade</label>
+                        {{ form.prioridade }}
+                    </div>
+                </div>
+
+                <!-- ===================== -->
+                <!-- NÍVEL DE SUJEIRA -->
+                <!-- ===================== -->
+                <div class="form-group">
+                    <label>Nível de sujeira</label>
+                    {{ form.nivel_sujeira }}
+                </div>
+
+            <!-- ===================== -->
+            <!-- SETORES E COLABORADORES LADO A LADO -->
+            <!-- ===================== -->
+            <div class="form-row">
+
+                <!-- ===================== -->
+                <!-- SETORES -->
+                <!-- ===================== -->
+                <div class="form-group">
+                    <h3 style="color:white;">Setores</h3>
+
+                    <div class="dropdown" id="setoresDropdown">
+                        <div class="dropdown-btn" onclick="toggleDropdown('setoresDropdown')">
+                            Selecionar setores
+                        </div>
+
+                        <div class="dropdown-content">
+                            {% for setor in setores %}
+                                <label>
+                                    <input type="checkbox" name="setores" value="{{ setor.id }}"
+                                    {% if tarefa and setor in tarefa.setores.all %}checked{% endif %}>
+                                    {{ setor.nome }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== -->
+                <!-- COLABORADORES -->
+                <!-- ===================== -->
+                <div class="form-group">
+                    <h3 style="color:white;">Colaboradores</h3>
+
+                    <div class="dropdown" id="colaboradoresDropdown">
+                        <div class="dropdown-btn" onclick="toggleDropdown('colaboradoresDropdown')">
+                            Selecionar colaboradores
+                        </div>
+
+                        <div class="dropdown-content">
+                            {% for colaborador in colaboradores %}
+                                <label>
+                                    <input type="checkbox" name="colaboradores" value="{{ colaborador.id }}"
+                                    {% if tarefa and colaborador in tarefa.colaboradores.all %}checked{% endif %}>
+                                    {{ colaborador.nome }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
             </div>
-                {% include 'global/partials/footer.html' %}
+
+
+
+                <br>
+
+                <!-- ===================== -->
+                <!-- DATAS -->
+                <!-- ===================== -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data início</label>
+                        {{ form.data_inicio }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Previsão de término</label>
+                        {{ form.data_previsao_termino }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data término</label>
+                        {{ form.data_termino }}
+                    </div>
+                </div>
+
+                <!-- ===================== -->
+                <!-- BOTÃO -->
+                <!-- ===================== -->
+                <button type="submit" class="btn-salvar">
+                    Salvar Tarefa
+                </button>
+
+            </form>
+
         </div>
 
-    </body>
+        {% include 'global/partials/footer.html' %}
+    </div>
+
+    <!-- ===================== -->
+    <!-- SCRIPTS -->
+    <!-- ===================== -->
+    <script>
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        // Fecha dropdown ao clicar fora
+        document.addEventListener("click", function(event) {
+            const dropdowns = document.querySelectorAll(".dropdown");
+
+            dropdowns.forEach(drop => {
+                if (!drop.contains(event.target)) {
+                    drop.classList.remove("open");
+                }
+            });
+        });
+    </script>
+
+</body>
 </html>

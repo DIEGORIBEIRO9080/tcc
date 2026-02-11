@@ -61,7 +61,19 @@
                     <i class="fa-solid fa-pencil"></i>
                 </a>
 
-                <i class="fa-solid fa-trash excluir" title="Excluir"></i>
+                {% if perms.management.delete_colaborador %}
+                    <form action="{% url 'management:colaborador_delete' colaborador.id %}"
+                        method="POST"
+                        style="display:inline;"
+                        onsubmit="return confirm('Você deseja realmente excluir este colaborador?');">
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn-icon delete" title="Excluir colaborador">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                {% endif %}
+
 
             {% endif %}
 

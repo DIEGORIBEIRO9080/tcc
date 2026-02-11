@@ -1,0 +1,138 @@
+{% include 'global/partials/head.html' %}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #081028;
+        color: white;
+    }
+
+    /* Container principal */
+    form {
+        width: 100%;
+        max-width: 700px;
+        margin: 50px auto;
+        background: #0e1a40;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Título */
+    form h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 26px;
+        color: #ffffff;
+    }
+
+    /* Divs dos inputs */
+    form div {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 18px;
+    }
+
+    /* Labels */
+    form label {
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #cfd8ff;
+    }
+
+    /* Inputs */
+    form input {
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        outline: none;
+        background: #081028;
+        color: white;
+        font-size: 15px;
+        transition: 0.3s;
+    }
+
+    /* Efeito foco */
+    form input:focus {
+        border-color: #00d4ff;
+        box-shadow: 0px 0px 10px rgba(0, 212, 255, 0.4);
+    }
+
+    /* Linha separadora */
+    form hr {
+        border: none;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.15);
+        margin: 25px 0;
+    }
+
+    /* Botão */
+    form button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        background: #00d4ff;
+        color: #081028;
+        transition: 0.3s;
+    }
+
+    /* Hover botão */
+    form button:hover {
+        background: #00a8cc;
+        transform: scale(1.02);
+    }
+
+
+    /* ===========================
+    MENSAGENS FIXAS (SÓ AQUI)
+    =========================== */
+    .messages {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: auto;
+        padding-top: 40px;
+        padding-left: 190px;
+        
+        
+        width: 90%;
+        max-width: 700px;
+
+        z-index: 9999;
+    }
+
+    /* cada mensagem */
+    .messages .alert {
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 14px;
+        text-align: center;
+
+        box-shadow: 0px 0px 20px rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* tipos */
+    .messages .success {
+        background-color: rgba(0, 255, 100, 0.20);
+        border: 1px solid rgba(0, 255, 100, 0.60);
+        color: #00ff7b;
+        margin-bottom: 200px;
+    }
+
+    .messages .error {
+        background-color: rgba(255, 0, 0, 0.20);
+        border: 1px solid rgba(255, 0, 0, 0.60);
+        color: #ff5c5c;
+    }
+
+
+</style>

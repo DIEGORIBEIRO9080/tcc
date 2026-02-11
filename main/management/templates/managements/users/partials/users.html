@@ -25,6 +25,30 @@
     </td>
 
     <td>
-        <a href="#">Editar</a>
+        
+        {% if perms.auth.change_user %}
+            <a href="{% url 'authors:user_edit' user.id %}"
+            title="Editar usuário"
+            class="btn-icon edit">
+                <i class="fa-solid fa-pencil"></i>
+            </a>
+        {% endif %}
+
+        {% if perms.auth.delete_user %}
+            <form action="{% url 'authors:user_delete' user.id %}" method="POST"
+                style="display:inline;"
+                onsubmit="return confirm('Você deseja realmente excluir este usuário?');">
+
+                {% csrf_token %}
+
+                <button type="submit" class="btn-icon delete" title="Excluir usuário">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+        {% endif %}
+
+
+
+
     </td>
 </tr>

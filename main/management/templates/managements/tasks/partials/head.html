@@ -91,4 +91,239 @@
                 color:  #478EEB;
             }
 
+
+
+
+
+
+
+
+
+            /* ==============================
+            FORMULÁRIO DE TAREFAS
+            ============================== */
+
+            .tarefa-form {
+                background-color: #0B1739;
+                padding: 30px;
+                border-radius: 12px;
+                max-width: 950px;
+                margin: 30px auto;
+                box-shadow: 0px 0px 15px rgba(0,0,0,0.4);
+            }
+
+            /* Grupos */
+            .tarefa-form .form-group {
+                margin-bottom: 15px;
+            }
+
+            /* Labels */
+            .tarefa-form label {
+                color: #fff;
+                font-weight: bold;
+                display: block;
+                margin-bottom: 8px;
+                font-size: 15px;
+            }
+
+            /* Inputs, selects e textarea */
+            .tarefa-form input,
+            .tarefa-form select,
+            .tarefa-form textarea {
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+                border: none;
+                outline: none;
+                font-size: 15px;
+                background-color: #fff;
+            }
+
+            /* Descrição menor */
+            .tarefa-form textarea {
+                height: 70px;
+                resize: none;
+            }
+
+            /* Linhas lado a lado */
+            .tarefa-form .form-row {
+                display: flex;
+                gap: 20px;
+            }
+
+            .tarefa-form .form-row .form-group {
+                flex: 1;
+            }
+
+            /* ==============================
+            DROPDOWN CHECKBOX
+            ============================== */
+
+            .tarefa-form .dropdown {
+                position: relative;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .tarefa-form .dropdown-btn {
+                width: 100%;
+                padding: 12px;
+                background: #f0f0f0;
+                border: 1px solid #999;
+                cursor: pointer;
+                text-align: left;
+                border-radius: 10px;
+                font-weight: bold;
+            }
+
+            /* Lista dropdown */
+            .tarefa-form .dropdown-content {
+                display: none;
+                position: absolute;
+                background: #fff;
+                border: 1px solid #999;
+                width: 100%;
+                max-height: 180px; /* ALTURA FIXA */
+                overflow-y: auto;  /* SCROLL */
+                z-index: 999;
+                padding: 10px;
+                border-radius: 10px;
+                margin-top: 8px;
+                box-shadow: 0px 0px 15px rgba(0,0,0,0.4);
+            }
+
+            /* Labels dentro do dropdown */
+            .tarefa-form .dropdown-content label {
+                display: block;
+                padding: 8px;
+                cursor: pointer;
+                border-radius: 8px;
+                color: #000;
+                font-weight: normal;
+            }
+
+            /* Hover bonito */
+            .tarefa-form .dropdown-content label:hover {
+                background: #eee;
+            }
+
+            /* Checkbox */
+            .tarefa-form .dropdown-content input[type="checkbox"] {
+                margin-right: 10px;
+                transform: scale(1.2);
+            }
+
+            /* Abrir dropdown */
+            .tarefa-form .dropdown.open .dropdown-content {
+                display: block;
+            }
+
+            /* ==============================
+            BOTÃO SALVAR
+            ============================== */
+
+            .tarefa-form .btn-salvar {
+                background-color: #00D4FF;
+                color: #000;
+                font-weight: bold;
+                padding: 14px;
+                border: none;
+                width: 100%;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
+
+            .tarefa-form .btn-salvar:hover {
+                background-color: #00a8cc;
+                transform: scale(1.02);
+            }
+
+            /* ==============================
+            ERROS
+            ============================== */
+
+            .tarefa-form .errorlist {
+                color: #ff4d4d;
+                font-size: 14px;
+                margin-top: 5px;
+                margin-bottom: 10px;
+                list-style: none;
+                padding-left: 0;
+            }
+
+            /* ==============================
+            RESPONSIVIDADE
+            ============================== */
+
+            @media (max-width: 768px) {
+                .tarefa-form {
+                    padding: 20px;
+                }
+
+                .tarefa-form .form-row {
+                    flex-direction: column;
+                }
+            }
+
+            .tarefa-form .form-row {
+                display: flex;
+                gap: 20px;
+            }
+
+            .tarefa-form .form-row .form-group {
+                flex: 1;
+            }
+            /* ==============================
+            DROPDOWN - ITENS BONITOS E ALINHADOS
+            ============================== */
+
+            .tarefa-form .dropdown-content label {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 10px;
+
+                padding: 8px 10px;
+                border-radius: 8px;
+
+                font-size: 14px;
+                color: #000;
+                cursor: pointer;
+
+                transition: 0.2s;
+            }
+
+            /* Hover no item */
+            .tarefa-form .dropdown-content label:hover {
+                background-color: #e6f8ff;
+            }
+
+            /* Checkbox alinhado e fixo */
+            .tarefa-form .dropdown-content input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                margin: 0;
+                flex-shrink: 0;
+                cursor: pointer;
+            }
+
+            /* Texto do item */
+            .tarefa-form .dropdown-content label {
+                white-space: nowrap;
+            }
+            .btn-icon.delete {
+                background: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
         </style>

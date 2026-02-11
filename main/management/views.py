@@ -30,7 +30,9 @@ from openpyxl import Workbook
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
-
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
 from reportlab.lib.units import cm
 from io import BytesIO
 
@@ -46,20 +48,106 @@ from reportlab.lib.styles import getSampleStyleSheet
 from datetime import datetime
 import csv
 import json
+from django.db.models.deletion import ProtectedError
+from django.shortcuts import render
+from django.db.models import Count
+from django.db.models.functions import ExtractMonth
+from datetime import datetime
+
+from .models import Tarefa
+from management.models import Colaborador, Setor  # ajuste o caminho se necessário
+
+
+##############################################################################
+####################         DASHBOARD      ##############################
+##############################################################################
 
 
 
 
 
+@login_required(login_url='/usuarios/login/')
 def home(request):
-    return render(request, 'managements/dashboards/pages/listar.html')
+    ano_atual = datetime.now().year
+
+    # ==============================
+    # CARDS (4 quadrados)
+    # ==============================
+    total_colaboradores = Colaborador.objects.count()
+    total_setores = Setor.objects.count()
+
+    tarefas_concluidas = Tarefa.objects.filter(status="concluida").count()
+    tarefas_pendentes = Tarefa.objects.filter(status="pendente").count()
+
+    # ==============================
+    # GRÁFICO 1 - Tarefas por mês
+    # ==============================
+    tarefas_por_mes = (
+        Tarefa.objects.filter(data_inicio__year=ano_atual)
+        .annotate(mes=ExtractMonth("data_inicio"))
+        .values("mes")
+        .annotate(total=Count("id"))
+        .order_by("mes")
+    )
+
+    lista_meses = [0] * 12
+    for item in tarefas_por_mes:
+        lista_meses[item["mes"] - 1] = item["total"]
+
+    # ==============================
+    # GRÁFICO 2 - Tarefas por colaborador
+    # ==============================
+    colaboradores = (
+        Colaborador.objects.annotate(total=Count("tarefas"))
+        .values("nome", "total")
+        .order_by("-total")
+    )
+
+    labels_colaboradores = [c["nome"] for c in colaboradores]
+    dados_colaboradores = [c["total"] for c in colaboradores]
+
+    # ==============================
+    # GRÁFICO 3 - Tarefas por setor
+    # ==============================
+    setores = (
+        Setor.objects.annotate(total=Count("tarefas"))
+        .values("nome", "total")
+        .order_by("-total")
+    )
+
+    labels_setores = [s["nome"] for s in setores]
+    dados_setores = [s["total"] for s in setores]
+
+    context = {
+        # cards
+        "total_colaboradores": total_colaboradores,
+        "tarefas_concluidas": tarefas_concluidas,
+        "total_setores": total_setores,
+        "tarefas_pendentes": tarefas_pendentes,
+
+        # gráfico mensal
+        "tarefas_mes": lista_meses,
+        "ano_atual": ano_atual,
+
+        # gráfico colaborador
+        "labels_colaboradores": labels_colaboradores,
+        "dados_colaboradores": dados_colaboradores,
+
+        # gráfico setor
+        "labels_setores": labels_setores,
+        "dados_setores": dados_setores,
+    }
+
+    return render(request, "managements/dashboards/pages/listar.html", context)
+
+
 
 
 
 ##############################################################################
 ####################             SETORES        ##############################
 ##############################################################################
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.view_setor', raise_exception=True)
 def sectors(request):
     setores_list = Setor.objects.all().order_by('nome')
@@ -77,7 +165,7 @@ def sectors(request):
         'page_obj': page_obj,
         'empty_rows': range(empty_rows)
     })
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.add_setor', raise_exception=True)
 def setor_create(request):
     if request.method == 'POST':
@@ -93,7 +181,7 @@ def setor_create(request):
     return render(request, 'managements/sectors/pages/form.html', {
         'form': form
     })
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.change_setor', raise_exception=True)
 def setor_edit(request, id):
     setor = get_object_or_404(Setor, id=id)
@@ -114,11 +202,26 @@ def setor_edit(request, id):
     })
 
 
+@login_required(login_url='/usuarios/login/')
+@permission_required('management.delete_setor', raise_exception=True)
+def setor_delete(request, id):
+    setor = get_object_or_404(Setor, id=id)
+
+    if request.method == 'POST':
+        try:
+            setor.delete()
+            messages.success(request, 'Setor excluído com sucesso!')
+        except ProtectedError:
+            messages.error(request, 'Não é possível excluir este setor porque ele está vinculado a uma tarefa.')
+
+    return redirect('management:sectors')
+
+
 ##############################################################################
 ####################          COLABORADOR       ##############################
 ##############################################################################
 
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.view_colaborador', raise_exception=True)
 def colaborators(request):
 
@@ -147,7 +250,7 @@ def colaborators(request):
         "empty_rows": range(empty_rows),
         'status_selecionados': status_selecionados,
     })
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.change_colaborador', raise_exception=True)
 def colaborador_mudar_status(request, id, novo_status):
     colaborador = get_object_or_404(Colaborador, id=id)
@@ -168,7 +271,7 @@ def colaborador_mudar_status(request, id, novo_status):
 
     return redirect('management:colaborators')
 
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.add_colaborador', raise_exception=True)
 def colaborador_create(request):
     if request.method == 'POST':
@@ -184,7 +287,7 @@ def colaborador_create(request):
     return render(request, 'managements/colaborators/pages/form.html', {
         'form': form
     })
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.change_colaborador', raise_exception=True)
 def colaborador_edit(request, id):
     colaborador = get_object_or_404(Colaborador, id=id)
@@ -204,11 +307,24 @@ def colaborador_edit(request, id):
         'colaborador': colaborador
     })
 
+@login_required(login_url='/usuarios/login/')
+@permission_required('management.delete_colaborador', raise_exception=True)
+def colaborador_delete(request, id):
+    colaborador = get_object_or_404(Colaborador, id=id)
 
+    if request.method == "POST":
+        try:
+            colaborador.delete()
+            messages.success(request, "Colaborador excluído com sucesso!")
+        except ProtectedError:
+            messages.error(request, "Não é possível excluir este colaborador porque ele está vinculado a uma tarefa.")
+
+    return redirect("management:colaborators")
 
 ##############################################################################
 ####################             TAREFAS        ##############################
 ##############################################################################
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.view_tarefa', raise_exception=True)
 def tasks(request):
     status_selecionados = request.GET.getlist('status')
@@ -231,15 +347,34 @@ def tasks(request):
         'empty_rows': range(empty_rows),
         'status_selecionados': status_selecionados,
     })
+
+
+
+
+
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.change_tarefa', raise_exception=True)
 def alterar_status_tarefa(request, tarefa_id, novo_status):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
 
-    # validação extra (segurança)
     status_validos = ['pendente', 'em_andamento', 'concluida', 'cancelada']
     if novo_status not in status_validos:
         messages.error(request, 'Status inválido.')
         return redirect('management:tasks')
+
+    # 🔒 REGRA DE NEGÓCIO NA VIEW (sem mexer na model)
+    if novo_status == 'concluida':
+        tarefa.data_termino = timezone.now()
+
+    elif novo_status == 'em_andamento':
+        if not tarefa.data_inicio:
+            tarefa.data_inicio = timezone.now()
+
+    elif novo_status == 'pendente':
+        tarefa.data_termino = None
+
+    elif novo_status == 'cancelada':
+        tarefa.data_termino = timezone.now()
 
     tarefa.status = novo_status
     tarefa.save()
@@ -247,52 +382,88 @@ def alterar_status_tarefa(request, tarefa_id, novo_status):
     messages.success(request, 'Status da tarefa atualizado com sucesso!')
     return redirect('management:tasks')
 
+
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.add_tarefa', raise_exception=True)
 def tarefa_create(request):
+
+    setores = Setor.objects.all()
+    colaboradores = Colaborador.objects.all()
+
     if request.method == 'POST':
         form = TarefaForm(request.POST, request.FILES)
 
         if form.is_valid():
-            tarefa= form.save()
+            tarefa = form.save(commit=False)
 
-            setores = form.cleaned_data['setores']
-            colaboradores = form.cleaned_data['colaboradores']
+            if tarefa.status == 'concluida':
+                tarefa.data_termino = timezone.now()
 
-            tarefa.setores.set(setores)  # Django cuida do through
-            tarefa.colaboradores.set(colaboradores)
-            
+            elif tarefa.status == 'em_andamento' and not tarefa.data_inicio:
+                tarefa.data_inicio = timezone.now()
 
-            messages.success(request, 'tarefa cadastrado com sucesso!')
+            else:
+                tarefa.data_termino = None
+
+            tarefa.save()
+
+            setores_selecionados = form.cleaned_data['setores']
+            colaboradores_selecionados = form.cleaned_data['colaboradores']
+
+            tarefa.setores.set(setores_selecionados)
+            tarefa.colaboradores.set(colaboradores_selecionados)
+
+            messages.success(request, 'Tarefa cadastrada com sucesso!')
             return redirect('management:tasks')
+
     else:
         form = TarefaForm()
 
     return render(request, 'managements/tasks/pages/form.html', {
-        'form': form
+        'form': form,
+        "setores": setores,
+        "colaboradores": colaboradores,
     })
 
-@permission_required('management.change_tarefas', raise_exception=True)
+@login_required(login_url='/usuarios/login/')
+@permission_required('management.change_tarefa', raise_exception=True)
 def tarefa_edit(request, id):
     tarefa = get_object_or_404(Tarefa, id=id)
+
+    setores = Setor.objects.all()
+    colaboradores = Colaborador.objects.all()
 
     if request.method == 'POST':
         form = TarefaForm(request.POST, request.FILES, instance=tarefa)
 
         if form.is_valid():
             form.save()
-            messages.success(request, 'tarefa atualizada com sucesso!')
+            messages.success(request, 'Tarefa atualizada com sucesso!')
             return redirect('management:tasks')
     else:
         form = TarefaForm(instance=tarefa)
 
     return render(request, 'managements/tasks/pages/form.html', {
         'form': form,
-        'tarefa': tarefa
+        'tarefa': tarefa,
+        'setores': setores,
+        'colaboradores': colaboradores
     })
 
 
+@login_required(login_url='/usuarios/login/')
+@permission_required('management.delete_tarefa', raise_exception=True)
+def tarefa_delete(request, id):
+    tarefa = get_object_or_404(Tarefa, id=id)
 
+    if request.method == "POST":
+        try:
+            tarefa.delete()
+            messages.success(request, "Tarefa excluída com sucesso!")
+        except ProtectedError:
+            messages.error(request, "Não é possível excluir esta tarefa porque ela está vinculada a outros registros.")
 
+    return redirect("management:tasks")
 
 
 
@@ -303,9 +474,10 @@ def tarefa_edit(request, id):
 ##############################################################################
 ####################            USUARIOS        ##############################
 ##############################################################################
+
 def is_admin(user):
     return user.is_superuser
-
+@login_required(login_url='/usuarios/login/')
 @login_required
 @user_passes_test(is_admin)
 def lista_usuarios(request):
@@ -327,13 +499,13 @@ def lista_usuarios(request):
 ####################           RELATORIOS       ##############################
 ##############################################################################
 
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.view_tarefa', raise_exception=True)
 def relatorio_menu(request):
 
     return render(request, 'managements/reports/pages/index.html')
 
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.view_tarefa', raise_exception=True)
 def relatorio_form(request):
     setores = Setor.objects.all()
@@ -346,7 +518,7 @@ def relatorio_form(request):
     return render(request, 'managements/reports/pages/form.html', context)
 
 
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.view_tarefa', raise_exception=True)
 def gerar_relatorio(request):
     tipo = request.GET.get('tipo', 'completo')  # completo | setor | colaborador
@@ -533,7 +705,7 @@ def gerar_relatorio(request):
 
 
 
-
+@login_required(login_url='/usuarios/login/')
 def dashboard_relatorios(request):
     tipo = request.GET.get('tipo', 'setor')
 
@@ -600,7 +772,7 @@ def dashboard_relatorios(request):
         'mes': mes_final,
         'titulo_tipo': titulo_tipo
     })
-
+@login_required(login_url='/usuarios/login/')
 @permission_required('management.view_tarefa', raise_exception=True)
 def dashboard_menu(request):
     context = {
@@ -620,10 +792,9 @@ def dashboard_menu(request):
 
 from django.http import JsonResponse
 from django.utils import timezone
-from datetime import timedelta
 from .models import Tarefa
 
-
+@login_required(login_url='/usuarios/login/')
 def notificacoes_tarefas(request):
     agora = timezone.now()
     notificacoes = []
@@ -638,21 +809,25 @@ def notificacoes_tarefas(request):
         diferenca = tarefa.data_previsao_termino - agora
         minutos = int(diferenca.total_seconds() // 60)
 
-        # ATRASADA
+        # =========================
+        # TAREFA ATRASADA
+        # =========================
         if minutos < 0:
             notificacoes.append({
                 "tarefa": tarefa.titulo,
                 "status": "Atrasada",
-                "tempo": f"Atrasada há {abs(minutos)} min",
+                "tempo": abs(minutos),  # 👈 SÓ NÚMERO
                 "tipo": "atrasada"
             })
 
+        # =========================
         # PRÓXIMA DO PRAZO
+        # =========================
         elif minutos in alertas:
             notificacoes.append({
                 "tarefa": tarefa.titulo,
                 "status": "Próxima do prazo",
-                "tempo": f"Faltam {minutos} min",
+                "tempo": minutos,  # 👈 SÓ NÚMERO
                 "tipo": "alerta"
             })
 
@@ -662,3 +837,42 @@ def notificacoes_tarefas(request):
     })
 
 
+##############################################################################
+####################          CONFIGURAÇÃO      ##############################
+##############################################################################
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .models import ConfiguracaoSistema
+
+
+
+def is_admin(user):
+    return user.is_superuser
+
+
+@login_required(login_url='/usuarios/login/')
+@user_passes_test(is_admin)
+def configuracoes_view(request):
+    config, created = ConfiguracaoSistema.objects.get_or_create(id=1)
+
+    if request.method == "POST":
+        email_institucional = request.POST.get("email_institucional")
+        telefone = request.POST.get("telefone")
+        endereco = request.POST.get("endereco")
+
+        config.email_institucional = email_institucional if email_institucional else None
+        config.telefone = telefone if telefone else None
+        config.endereco = endereco if endereco else None
+        config.save()
+
+        messages.success(request, "Configurações atualizadas com sucesso!")
+        return redirect("/configuracoes")
+
+    return render(request, "managements/configurations/pages/index.html", {
+        "config": config
+    })

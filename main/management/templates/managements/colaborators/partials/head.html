@@ -147,6 +147,120 @@
             cursor: pointer;
             margin-right: 8px;
         }
+        h2{
+            text-align:center;
+            color:#ffffff;
+        }
+
+        
+        /* ==============================
+        FORMULÁRIO DE COLABORADOR
+        ============================== */
+
+        .colaborador-form {
+            background-color: #0B1739;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 700px;
+            margin: 30px auto; /* CENTRALIZADO */
+        }
+
+        /* Linhas com dois campos */
+        .colaborador-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Grupos */
+        .colaborador-form .form-group {
+            margin-bottom: 16px;
+        }
+
+        /* Labels */
+        .colaborador-form label {
+            display: block;
+            margin-bottom: 6px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Inputs */
+        .colaborador-form input,
+        .colaborador-form select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+        }
+
+        /* Foco */
+        .colaborador-form input:focus,
+        .colaborador-form select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+        }
+
+        /* Erros */
+        .colaborador-form .errorlist {
+            margin-top: 4px;
+            color: #ffb4b4;
+            font-size: 13px;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        /* Botão */
+        .colaborador-form .btn-salvar {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #ffffff;
+            color: #0B1739;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .colaborador-form .btn-salvar:hover {
+            background-color: #121f4a;
+        }
+        /* Wrapper só do formulário */
+        .colaborador-wrapper {
+            min-height: calc(100vh - 120px); 
+            /* ajusta se header/footer forem maiores */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .colaborador-form .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .btn-icon.delete {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-icon.delete i {
+            font-size: 18px;
+        }
+
+
 
 
 

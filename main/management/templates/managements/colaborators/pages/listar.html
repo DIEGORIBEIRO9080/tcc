@@ -7,6 +7,15 @@
 
         <div class="content">
             {% include 'global/partials/header.html' %}
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <div class="table-wrapper">
                 {% include 'managements/colaborators/partials/headerTable.html' %}
                 <table class="table" border="1" cellspacing="0" cellpadding="8">
