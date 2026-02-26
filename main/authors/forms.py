@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django import forms
+
 
 class RegisterForm(forms.ModelForm):
 
@@ -21,7 +21,7 @@ class RegisterForm(forms.ModelForm):
 
     password = forms.CharField(
         label="Senha",
-        required=True,
+        required=False,  # 🔥 agora é opcional (importante para edição)
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
 
@@ -39,28 +39,46 @@ class RegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # REMOVE required automático do HTML
+        # Remove atributo required automático do HTML
         for field in self.fields:
             self.fields[field].widget.attrs.pop("required", None)
 
+    # 🔥 Corrigido para não acusar duplicado na edição
     def clean_username(self):
         username = self.cleaned_data.get("username")
 
-        if User.objects.filter(username=username).exists():
+        qs = User.objects.filter(username=username)
+
+        # Se estiver editando, ignora o próprio usuário
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
             raise ValidationError("Esse usuário já existe.")
 
         return username
 
+    # 🔥 Corrigido para não acusar duplicado na edição
     def clean_email(self):
         email = self.cleaned_data.get("email")
 
-        if User.objects.filter(email=email).exists():
+        qs = User.objects.filter(email=email)
+
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
             raise ValidationError("Esse e-mail já está cadastrado.")
 
         return email
 
+    # 🔥 Senha opcional na edição
     def clean_password(self):
         password = self.cleaned_data.get("password")
+
+        # Se estiver editando e não digitou senha → mantém a atual
+        if not password:
+            return password
 
         if len(password) < 8:
             raise ValidationError("A senha deve ter pelo menos 8 caracteres.")

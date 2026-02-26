@@ -44,7 +44,7 @@ def register_create(request):
 
         # 🔥 volta pro formulário limpo e mostra mensagem
         form = RegisterForm()
-        return render(request, 'authors/cadastro/index.html', {'form': form})
+        return redirect('management:lista_usuarios')
 
     messages.error(request, "Erro ao cadastrar usuário. Verifique os campos.")
     return render(request, 'authors/cadastro/index.html', {'form': form})
@@ -68,6 +68,7 @@ def user_edit_view(request, user_id):
         "edit_user": user
     })
 
+
 @login_required(login_url='/usuarios/login/')
 def user_edit_save(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -80,31 +81,33 @@ def user_edit_save(request, user_id):
     if form.is_valid():
         user = form.save(commit=False)
 
+        # Atualiza senha apenas se preenchida
         password = form.cleaned_data.get("password")
         if password:
             user.set_password(password)
 
         user.save()
 
+        # Atualiza permissões
         role = form.cleaned_data["role"]
         user.groups.clear()
 
         if role == "Admin":
             user.is_superuser = True
             user.is_staff = True
-            user.save()
         else:
             user.is_superuser = False
             user.is_staff = False
-            user.save()
-
             grupo, _ = Group.objects.get_or_create(name=role)
             user.groups.add(grupo)
 
-        messages.success(request, "Usuário atualizado com sucesso!")
-        return redirect("authors:usuarios_cadastrar")
+        user.save()
 
-    # 🔥 AQUI TAMBÉM:
+        messages.success(request, "Usuário atualizado com sucesso!")
+
+        # ✅ REDIRECIONAMENTO CORRETO
+        return redirect("management:lista_usuarios")
+
     messages.error(request, "Erro ao atualizar usuário. Verifique os campos.")
 
     return render(request, "authors/cadastro/index.html", {

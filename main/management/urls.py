@@ -58,12 +58,4 @@ urlpatterns = [
     ##############################################################################
 
     path("configuracoes/", views.configuracoes_view, name="configuracoes"),
-
-
-
-
-
-
-
-
 ]

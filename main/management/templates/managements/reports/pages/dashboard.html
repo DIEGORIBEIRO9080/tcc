@@ -163,83 +163,201 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <script>
-    let chart = null;
 
-    function toggleDropdown(id) {
-        document.getElementById(id).classList.toggle('open');
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+let chart = null;
+
+function toggleDropdown(id) {
+    document.getElementById(id).classList.toggle('open');
+}
+
+function gerarExportacao() {
+    const exportar = document.querySelector('input[name="exportar"]:checked');
+
+    if (!exportar) {
+        alert('Escolha PNG ou PDF');
+        return;
     }
 
-    function gerarExportacao() {
+    const form = document.getElementById('form-dashboard');
+    const params = new URLSearchParams(new FormData(form)).toString();
 
-        const exportar = document.querySelector('input[name="exportar"]:checked');
+    fetch(`/relatorios/dashboard/?${params}`)
+        .then(res => res.json())
+        .then(data => {
+            const canvas = document.getElementById('graficoDashboard');
+            const ctx = canvas.getContext('2d');
 
-        if (!exportar) {
-            alert('Escolha PNG ou PDF');
-            return;
-        }
+            if (chart) chart.destroy();
 
-        const form = document.getElementById('form-dashboard');
-        const params = new URLSearchParams(new FormData(form)).toString();
+            // ===== NOVA PALETA DE AZUIS =====
+            const azuis = [
+                '#6ab0f5', '#5a9ee0', '#4a8ccb', '#3a7ab6', 
+                '#2a68a1', '#1f4e8c', '#1a3f77', '#153062'
+            ];
 
-        fetch(`/relatorios/dashboard/?${params}`)
-            .then(res => res.json())
-            .then(data => {
+            // Cria gradientes individuais para cada barra usando diferentes tons de azul
+            const backgrounds = data.labels.map((_, i) => {
+                const grad = ctx.createLinearGradient(0, 0, 0, 400);
+                grad.addColorStop(0, azuis[i % azuis.length]);        // tom mais claro no topo
+                grad.addColorStop(1, azuis[(i + 3) % azuis.length]);  // tom mais escuro na base
+                return grad;
+            });
 
-                const ctx = document.getElementById('graficoDashboard');
+            // Se preferir um gradiente uniforme para todas as barras (do azul claro para escuro):
+            // const gradienteUniforme = ctx.createLinearGradient(0, 0, 0, 400);
+            // gradienteUniforme.addColorStop(0, '#6ab0f5');
+            // gradienteUniforme.addColorStop(1, '#1f4e8c');
+            // const backgrounds = new Array(data.labels.length).fill(gradienteUniforme);
 
-                if (chart) chart.destroy();
+            // --- Título dinâmico (igual ao anterior) ---
+            let titulo = data.titulo_tipo || 'Relatório';
 
-                chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            data: data.valores,
-                            backgroundColor: '#5DA9E9'
-                        }]
+            if (data.periodo) {
+                titulo += ` - ${data.periodo}`;
+            } else if (data.data_inicio && data.data_fim) {
+                const mesesAbrev = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+                                    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dev'];
+                const inicio = new Date(data.data_inicio + 'T00:00:00');
+                const fim = new Date(data.data_fim + 'T00:00:00');
+
+                const mesInicio = mesesAbrev[inicio.getMonth()];
+                const anoInicio = inicio.getFullYear();
+                const mesFim = mesesAbrev[fim.getMonth()];
+                const anoFim = fim.getFullYear();
+
+                if (anoInicio === anoFim) {
+                    titulo += ` - ${mesInicio} - ${mesFim} ${anoInicio}`;
+                } else {
+                    titulo += ` - ${mesInicio}/${anoInicio} - ${mesFim}/${anoFim}`;
+                }
+            } else if (data.mes) {
+                titulo += ` - ${data.mes}`;
+            }
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Quantidade de tarefas',
+                        data: data.valores,
+                        backgroundColor: backgrounds,
+                        borderColor: '#FFFFFF',
+                        borderWidth: 2,
+                        borderRadius: 10,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8,
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: titulo,
+                            font: {
+                                size: 20,
+                                weight: 'bold',
+                                family: 'Arial'
+                            },
+                            color: '#333',
+                            padding: { top: 10, bottom: 20 }
+                        },
+                        tooltip: {
+                            backgroundColor: '#2C3E50',
+                            titleColor: '#ECF0F1',
+                            bodyColor: '#BDC3C7',
+                            borderColor: '#3498DB',
+                            borderWidth: 2,
+                            cornerRadius: 5,
+                            displayColors: false,
+                            callbacks: {
+                                label: (context) => ` ${context.parsed.y} tarefas`
+                            }
+                        }
                     },
-                    options: {
-                        responsive: false,
-                        plugins: {
-                            legend: { display: false },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#E5E5E5',
+                                borderDash: [5, 5]
+                            },
                             title: {
                                 display: true,
-                                text: `${data.titulo_tipo} - ${data.mes}`,
-                                font: { size: 18 }
+                                text: 'Quantidade',
+                                color: '#555',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                color: '#555',
+                                font: { size: 11 }
                             }
                         },
-                        scales: {
-                            y: { beginAtZero: true }
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#555',
+                                font: { size: 11, weight: '500' },
+                                maxRotation: 45,
+                                minRotation: 30
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 20,
+                            right: 20,
+                            top: 10,
+                            bottom: 10
                         }
                     }
-                });
-
-                setTimeout(() => {
-                    if (exportar.value === 'png') exportarPNG();
-                    if (exportar.value === 'pdf') exportarPDF();
-                }, 300);
+                }
             });
-    }
 
-    function exportarPNG() {
-        const canvas = document.getElementById('graficoDashboard');
-        const link = document.createElement('a');
-        link.download = 'dashboard_relatorio.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    }
+            setTimeout(() => {
+                if (exportar.value === 'png') exportarPNG();
+                if (exportar.value === 'pdf') exportarPDF();
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Erro ao gerar gráfico:', error);
+            alert('Ocorreu um erro ao gerar o relatório. Tente novamente.');
+        });
+}
 
-    function exportarPDF() {
-        const canvas = document.getElementById('graficoDashboard');
-        const img = canvas.toDataURL('image/png');
+function exportarPNG() {
+    const canvas = document.getElementById('graficoDashboard');
+    const link = document.createElement('a');
+    link.download = `dashboard_${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
 
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('landscape');
-        pdf.addImage(img, 'PNG', 10, 10, 270, 150);
-        pdf.save('dashboard_relatorio.pdf');
-    }
-    </script>
+function exportarPDF() {
+    const canvas = document.getElementById('graficoDashboard');
+    const imgData = canvas.toDataURL('image/png');
 
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+    });
+
+    const imgWidth = 280;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 10, 15, imgWidth, imgHeight);
+    pdf.save(`dashboard_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+</script>
     </body>
 </html>

@@ -3,7 +3,7 @@
 
 
 
-    <form action="{% url 'authors:create' %}" method="POST" class="register-form">
+    <form action="{% if edit_user %} {% url 'authors:user_edit_save' edit_user.id %} {% else %}{% url 'authors:create' %}{% endif %}" method="POST" class="register-form">
             {% if messages %}
                 <div class="messages">
                     {% for message in messages %}
