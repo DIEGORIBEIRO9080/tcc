@@ -4,7 +4,7 @@ from . import views
 app_name = 'management'
 
 urlpatterns = [
-    path('', home),
+    path('', home, name='home'),
     
 
     path('usuarios/', lista_usuarios, name='lista_usuarios'),
@@ -57,5 +57,5 @@ urlpatterns = [
     ####################          CONFIGURAÇÃO      ##############################
     ##############################################################################
 
-    path("configuracoes/", views.configuracoes_view, name="configuracoes"),
+    path("perfil/", views.perfil_view, name="perfil"),
 ]

@@ -838,7 +838,7 @@ def notificacoes_tarefas(request):
 
 
 ##############################################################################
-####################          CONFIGURAÇÃO      ##############################
+####################          Perfil     ##############################
 ##############################################################################
 
 
@@ -857,7 +857,7 @@ def is_admin(user):
 
 @login_required(login_url='/usuarios/login/')
 @user_passes_test(is_admin)
-def configuracoes_view(request):
+def perfil_view(request):
     config, created = ConfiguracaoSistema.objects.get_or_create(id=1)
 
     if request.method == "POST":
@@ -870,8 +870,8 @@ def configuracoes_view(request):
         config.endereco = endereco if endereco else None
         config.save()
 
-        messages.success(request, "Configurações atualizadas com sucesso!")
-        return redirect("/configuracoes")
+        messages.success(request, "perfil atualizado com sucesso!")
+        return redirect("management:perfil")
 
     return render(request, "managements/configurations/pages/index.html", {
         "config": config

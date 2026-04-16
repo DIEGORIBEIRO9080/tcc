@@ -3,27 +3,39 @@
     <div class="sidebar"> 
         <img src="{% static 'img/ifce.png' %}" alt="Logo IFCE" class="logo-ifce">
         <ul>
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/setores">Setores</a></li>
-            <li><a href="/colaboradores">Colaboradores</a></li>
-            <li><a href="/tarefas">Tarefas</a></li>
-            <li>
-                <a href="/relatorios/menu">Relatórios</a>
-            </li>
+            
+            <li><a href="{% url 'management:home' %}" >Dashboard</a></li>
+
+            
+            <li><a href="{% url 'management:sectors' %}" >Setores</a></li>
+
+            <li><a href="{% url 'management:colaborators' %}" >Colaboradores</a></li>
+
+            <li><a href="{% url 'management:tasks' %}" >Tarefas</a></li>
+
+            <li><a href="{% url 'management:relatorio_menu' %}" >Relatorios</a></li>
+
+
 
 
             <br><hr><br>
-            <li><a href="/tarefas">Perfil</a></li>
-            <li><a href="/usuarios">Usuarios</a></li>
+
+            <li><a href="{% url 'management:perfil' %}">Perfil</a></li>
+
+            <li><a href="{% url 'management:lista_usuarios' %}" >Usuarios</a></li>
+
+
+
 
             <br><hr>
-            
-
             <li>    
                 {% if user.is_authenticated %}
                     <a href="{% url 'authors:logout' %}" class="btn-logout">Sair</a>
                 {% endif %}
             </li>
+
+
+            
 
         </ul>
     </div>

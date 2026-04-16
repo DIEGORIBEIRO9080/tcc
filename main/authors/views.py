@@ -153,7 +153,7 @@ def login_view(request):
             login(request, user)
             messages.success(request, f"Bem-vindo, {user.first_name}!")
             # ✅ Redireciona para a página inicial do projeto
-            return redirect('/')  
+            return redirect('management:home')  
         else:
             messages.error(request, "Usuário ou senha incorretos.")
 
@@ -161,4 +161,4 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, "Você saiu com sucesso!")
-    return redirect('/usuarios/login/')  # URL fixa para login
+    return redirect('authors:login')  # URL fixa para login
