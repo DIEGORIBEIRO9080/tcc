@@ -1,4 +1,5 @@
-    <tr>
+{% load static %} 
+ <tr>
         <td class="img-col">
             {% if setor.imagem %}
                 <img 
@@ -9,11 +10,11 @@
                 >
             {% else %}
                 <img 
-                    src="/static/img/default-user.png" 
+                    src="{% static 'img/default-user.png' %}" 
                     alt="Foto padrão"
                     class="img-thumb"
-                    onclick="abrirImagem('/static/img/default-user.png')"
-                >
+                    onclick="abrirImagem('{% static 'img/default-user.png' %}')"
+                />
             {% endif %}
         </td>
 
