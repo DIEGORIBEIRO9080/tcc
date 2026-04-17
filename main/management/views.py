@@ -62,11 +62,7 @@ from management.models import Colaborador, Setor  # ajuste o caminho se necessá
 ####################         DASHBOARD      ##############################
 ##############################################################################
 
-
-
-
-
-@login_required(login_url='/usuarios/login/')
+@login_required()
 def home(request):
     ano_atual = datetime.now().year
 
@@ -147,7 +143,7 @@ def home(request):
 ##############################################################################
 ####################             SETORES        ##############################
 ##############################################################################
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.view_setor', raise_exception=True)
 def sectors(request):
     setores_list = Setor.objects.all().order_by('nome')
@@ -165,7 +161,8 @@ def sectors(request):
         'page_obj': page_obj,
         'empty_rows': range(empty_rows)
     })
-@login_required(login_url='/usuarios/login/')
+
+@login_required()
 @permission_required('management.add_setor', raise_exception=True)
 def setor_create(request):
     if request.method == 'POST':
@@ -181,7 +178,8 @@ def setor_create(request):
     return render(request, 'managements/sectors/pages/form.html', {
         'form': form
     })
-@login_required(login_url='/usuarios/login/')
+
+@login_required()
 @permission_required('management.change_setor', raise_exception=True)
 def setor_edit(request, id):
     setor = get_object_or_404(Setor, id=id)
@@ -202,7 +200,7 @@ def setor_edit(request, id):
     })
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.delete_setor', raise_exception=True)
 def setor_delete(request, id):
     setor = get_object_or_404(Setor, id=id)
@@ -221,7 +219,7 @@ def setor_delete(request, id):
 ####################          COLABORADOR       ##############################
 ##############################################################################
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.view_colaborador', raise_exception=True)
 def colaborators(request):
 
@@ -250,7 +248,7 @@ def colaborators(request):
         "empty_rows": range(empty_rows),
         'status_selecionados': status_selecionados,
     })
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.change_colaborador', raise_exception=True)
 def colaborador_mudar_status(request, id, novo_status):
     colaborador = get_object_or_404(Colaborador, id=id)
@@ -271,7 +269,7 @@ def colaborador_mudar_status(request, id, novo_status):
 
     return redirect('management:colaborators')
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.add_colaborador', raise_exception=True)
 def colaborador_create(request):
     if request.method == 'POST':
@@ -287,7 +285,9 @@ def colaborador_create(request):
     return render(request, 'managements/colaborators/pages/form.html', {
         'form': form
     })
-@login_required(login_url='/usuarios/login/')
+
+
+@login_required()
 @permission_required('management.change_colaborador', raise_exception=True)
 def colaborador_edit(request, id):
     colaborador = get_object_or_404(Colaborador, id=id)
@@ -307,7 +307,8 @@ def colaborador_edit(request, id):
         'colaborador': colaborador
     })
 
-@login_required(login_url='/usuarios/login/')
+
+@login_required()
 @permission_required('management.delete_colaborador', raise_exception=True)
 def colaborador_delete(request, id):
     colaborador = get_object_or_404(Colaborador, id=id)
@@ -324,7 +325,7 @@ def colaborador_delete(request, id):
 ##############################################################################
 ####################             TAREFAS        ##############################
 ##############################################################################
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.view_tarefa', raise_exception=True)
 def tasks(request):
     status_selecionados = request.GET.getlist('status')
@@ -352,7 +353,7 @@ def tasks(request):
 
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.change_tarefa', raise_exception=True)
 def alterar_status_tarefa(request, tarefa_id, novo_status):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
@@ -383,7 +384,7 @@ def alterar_status_tarefa(request, tarefa_id, novo_status):
     return redirect('management:tasks')
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.add_tarefa', raise_exception=True)
 def tarefa_create(request):
 
@@ -425,7 +426,7 @@ def tarefa_create(request):
         "colaboradores": colaboradores,
     })
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.change_tarefa', raise_exception=True)
 def tarefa_edit(request, id):
     tarefa = get_object_or_404(Tarefa, id=id)
@@ -451,7 +452,7 @@ def tarefa_edit(request, id):
     })
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.delete_tarefa', raise_exception=True)
 def tarefa_delete(request, id):
     tarefa = get_object_or_404(Tarefa, id=id)
@@ -477,8 +478,8 @@ def tarefa_delete(request, id):
 
 def is_admin(user):
     return user.is_superuser
-@login_required(login_url='/usuarios/login/')
-@login_required
+@login_required()
+
 @user_passes_test(is_admin)
 def lista_usuarios(request):
     usuarios = User.objects.all().order_by('username')
@@ -499,7 +500,7 @@ def lista_usuarios(request):
 ####################           RELATORIOS       ##############################
 ##############################################################################
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @permission_required('management.view_tarefa', raise_exception=True)
 def relatorio_menu(request):
 
@@ -518,8 +519,7 @@ def relatorio_form(request):
     return render(request, 'managements/reports/pages/form.html', context)
 
 
-@login_required(login_url='/usuarios/login/')
-@permission_required('management.view_tarefa', raise_exception=True)
+@login_required()
 def gerar_relatorio(request):
     tipo = request.GET.get('tipo', 'completo')  # completo | setor | colaborador
     setores = request.GET.getlist('setores')
@@ -705,7 +705,7 @@ def gerar_relatorio(request):
 
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 def dashboard_relatorios(request):
     tipo = request.GET.get('tipo', 'setor')
 
@@ -772,7 +772,8 @@ def dashboard_relatorios(request):
         'mes': mes_final,
         'titulo_tipo': titulo_tipo
     })
-@login_required(login_url='/usuarios/login/')
+
+@login_required()
 @permission_required('management.view_tarefa', raise_exception=True)
 def dashboard_menu(request):
     context = {
@@ -794,7 +795,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from .models import Tarefa
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 def notificacoes_tarefas(request):
     agora = timezone.now()
     notificacoes = []
@@ -855,7 +856,7 @@ def is_admin(user):
     return user.is_superuser
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 @user_passes_test(is_admin)
 def perfil_view(request):
     config, created = ConfiguracaoSistema.objects.get_or_create(id=1)

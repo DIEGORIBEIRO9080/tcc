@@ -11,14 +11,14 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from .forms import LoginForm
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 def register_view(request):
     form = RegisterForm()  # SEM request.POST
     
 
     return render(request, 'authors/cadastro/index.html', {'form': form})
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 def register_create(request):
     if request.method != "POST":
         return redirect('authors:usuarios_cadastrar')
@@ -53,7 +53,7 @@ def register_create(request):
 
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 def user_edit_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
@@ -69,7 +69,7 @@ def user_edit_view(request, user_id):
     })
 
 
-@login_required(login_url='/usuarios/login/')
+@login_required()
 def user_edit_save(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
@@ -116,8 +116,7 @@ def user_edit_save(request, user_id):
     })
 
 
-@login_required(login_url='/usuarios/login/')
-@login_required
+@login_required()
 @permission_required('auth.delete_user', raise_exception=True)
 def user_delete(request, id):
 
@@ -158,6 +157,7 @@ def login_view(request):
             messages.error(request, "Usuário ou senha incorretos.")
 
     return render(request, 'authors/cadastro/logar.html', {'form': form})
+
 def logout_view(request):
     logout(request)
     messages.success(request, "Você saiu com sucesso!")
