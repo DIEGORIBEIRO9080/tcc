@@ -52,7 +52,7 @@ class Setor(models.Model):
 
     nome = models.CharField(max_length=150)
     descricao = models.TextField(blank=True, null=True)
-    imagem = models.ImageField(upload_to='/var/www/taskif/tcc/main/media/setores/', blank=True, null=True)
+    imagem = models.ImageField(upload_to='setores/', blank=True, null=True)
     dimensao = models.CharField(max_length=100)
     natureza_piso = models.CharField(max_length=100)
     area_envidracada = models.CharField(max_length=100)
