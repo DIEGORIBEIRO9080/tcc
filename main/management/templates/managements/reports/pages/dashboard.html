@@ -186,55 +186,38 @@ function gerarExportacao() {
     const params = new URLSearchParams(new FormData(form)).toString();
 
     fetch(`/relatorios/dashboard/?${params}`)
-        .then(res => res.json())
+        .then(async res => {
+            const text = await res.text();
+
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error("Resposta inválida:", text);
+                throw e;
+            }
+        })
         .then(data => {
+
             const canvas = document.getElementById('graficoDashboard');
             const ctx = canvas.getContext('2d');
 
             if (chart) chart.destroy();
 
-            // ===== NOVA PALETA DE AZUIS =====
             const azuis = [
-                '#6ab0f5', '#5a9ee0', '#4a8ccb', '#3a7ab6', 
+                '#6ab0f5', '#5a9ee0', '#4a8ccb', '#3a7ab6',
                 '#2a68a1', '#1f4e8c', '#1a3f77', '#153062'
             ];
 
-            // Cria gradientes individuais para cada barra usando diferentes tons de azul
             const backgrounds = data.labels.map((_, i) => {
                 const grad = ctx.createLinearGradient(0, 0, 0, 400);
-                grad.addColorStop(0, azuis[i % azuis.length]);        // tom mais claro no topo
-                grad.addColorStop(1, azuis[(i + 3) % azuis.length]);  // tom mais escuro na base
+                grad.addColorStop(0, azuis[i % azuis.length]);
+                grad.addColorStop(1, azuis[(i + 3) % azuis.length]);
                 return grad;
             });
 
-            // Se preferir um gradiente uniforme para todas as barras (do azul claro para escuro):
-            // const gradienteUniforme = ctx.createLinearGradient(0, 0, 0, 400);
-            // gradienteUniforme.addColorStop(0, '#6ab0f5');
-            // gradienteUniforme.addColorStop(1, '#1f4e8c');
-            // const backgrounds = new Array(data.labels.length).fill(gradienteUniforme);
-
-            // --- Título dinâmico (igual ao anterior) ---
             let titulo = data.titulo_tipo || 'Relatório';
 
-            if (data.periodo) {
-                titulo += ` - ${data.periodo}`;
-            } else if (data.data_inicio && data.data_fim) {
-                const mesesAbrev = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-                                    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dev'];
-                const inicio = new Date(data.data_inicio + 'T00:00:00');
-                const fim = new Date(data.data_fim + 'T00:00:00');
-
-                const mesInicio = mesesAbrev[inicio.getMonth()];
-                const anoInicio = inicio.getFullYear();
-                const mesFim = mesesAbrev[fim.getMonth()];
-                const anoFim = fim.getFullYear();
-
-                if (anoInicio === anoFim) {
-                    titulo += ` - ${mesInicio} - ${mesFim} ${anoInicio}`;
-                } else {
-                    titulo += ` - ${mesInicio}/${anoInicio} - ${mesFim}/${anoFim}`;
-                }
-            } else if (data.mes) {
+            if (data.mes) {
                 titulo += ` - ${data.mes}`;
             }
 
@@ -246,106 +229,71 @@ function gerarExportacao() {
                         label: 'Quantidade de tarefas',
                         data: data.valores,
                         backgroundColor: backgrounds,
-                        borderColor: '#FFFFFF',
+                        borderColor: '#fff',
                         borderWidth: 2,
-                        borderRadius: 10,
-                        barPercentage: 0.7,
-                        categoryPercentage: 0.8,
+                        borderRadius: 10
                     }]
                 },
                 options: {
                     responsive: false,
-                    maintainAspectRatio: true,
+                    animation: {
+                        onComplete: function () {
+
+                            // 🔥 GARANTE QUE O CANVAS ESTÁ PRONTO
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+
+                                    if (exportar.value === 'png') exportarPNG();
+                                    if (exportar.value === 'pdf') exportarPDF();
+
+                                });
+                            });
+                        }
+                    },
                     plugins: {
                         legend: { display: false },
                         title: {
                             display: true,
-                            text: titulo,
-                            font: {
-                                size: 20,
-                                weight: 'bold',
-                                family: 'Arial'
-                            },
-                            color: '#333',
-                            padding: { top: 10, bottom: 20 }
-                        },
-                        tooltip: {
-                            backgroundColor: '#2C3E50',
-                            titleColor: '#ECF0F1',
-                            bodyColor: '#BDC3C7',
-                            borderColor: '#3498DB',
-                            borderWidth: 2,
-                            cornerRadius: 5,
-                            displayColors: false,
-                            callbacks: {
-                                label: (context) => ` ${context.parsed.y} tarefas`
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#E5E5E5',
-                                borderDash: [5, 5]
-                            },
-                            title: {
-                                display: true,
-                                text: 'Quantidade',
-                                color: '#555',
-                                font: { size: 12, weight: 'bold' }
-                            },
-                            ticks: {
-                                stepSize: 1,
-                                color: '#555',
-                                font: { size: 11 }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: '#555',
-                                font: { size: 11, weight: '500' },
-                                maxRotation: 45,
-                                minRotation: 30
-                            }
-                        }
-                    },
-                    layout: {
-                        padding: {
-                            left: 20,
-                            right: 20,
-                            top: 10,
-                            bottom: 10
+                            text: titulo
                         }
                     }
                 }
             });
-
-            setTimeout(() => {
-                if (exportar.value === 'png') exportarPNG();
-                if (exportar.value === 'pdf') exportarPDF();
-            }, 500);
         })
         .catch(error => {
             console.error('Erro ao gerar gráfico:', error);
-            alert('Ocorreu um erro ao gerar o relatório. Tente novamente.');
+            alert('Erro ao gerar relatório');
         });
 }
 
 function exportarPNG() {
     const canvas = document.getElementById('graficoDashboard');
+
+    const img = canvas.toDataURL('image/png');
+
+    if (!img || img === 'data:,') {
+        console.error('PNG inválido');
+        return;
+    }
+
     const link = document.createElement('a');
     link.download = `dashboard_${new Date().toISOString().slice(0, 10)}.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.href = img;
     link.click();
 }
 
 function exportarPDF() {
     const canvas = document.getElementById('graficoDashboard');
+
     const imgData = canvas.toDataURL('image/png');
 
+    if (!imgData || imgData === 'data:,') {
+        console.error('Canvas não renderizado');
+        return;
+    }
+
     const { jsPDF } = window.jspdf;
+
     const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
