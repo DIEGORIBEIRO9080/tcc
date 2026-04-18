@@ -1,21 +1,31 @@
 {% load static %} 
  <tr>
         <td class="img-col">
+
+            {% load static %}
+
+            {% static 'img/default-user.png' as default_img %}
+
             {% if setor.imagem %}
-                <img 
-                    src="{{ setor.imagem.url }}" 
-                    alt="Foto de {{ setor.nome }}"
-                    class="img-thumb"
-                    onclick="abrirImagem('{{ setor.imagem.url }}')"
-                >
+                {% with img_url=setor.imagem.url %}
+                    <img 
+                        src="{{ img_url }}" 
+                        alt="Foto de {{ setor.nome }}"
+                        class="img-thumb"
+                        onclick="abrirImagem('{{ img_url }}')"
+                    />
+                {% endwith %}
             {% else %}
-                <img 
-                    src="{% static 'img/default-user.png' %}" 
-                    alt="Foto padrão"
-                    class="img-thumb"
-                    onclick="abrirImagem('{% static 'img/default-user.png' %}')"
-                />
+                {% with img_url=default_img %}
+                    <img 
+                        src="{{ img_url }}" 
+                        alt="Foto padrão"
+                        class="img-thumb"
+                        onclick="abrirImagem('{{ img_url }}')"
+                    />
+                {% endwith %}
             {% endif %}
+
         </td>
 
         <td>{{ setor.nome }}</td>

@@ -58,4 +58,6 @@ urlpatterns = [
     ##############################################################################
 
     path("perfil/", views.perfil_view, name="perfil"),
+
+    path('notificacoes/', notificacoes_tarefas, name='notificacoes_tarefas'),
 ]

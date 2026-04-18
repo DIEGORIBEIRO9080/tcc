@@ -1,15 +1,16 @@
 {% load static %} 
     <tr>
+
         <td class="img-col">
+
             {% if colaborador.imagem %}
                 <img 
                     src="{{ colaborador.imagem.url }}" 
                     alt="Foto de {{ colaborador.nome }}"
                     class="img-thumb"
                     onclick="abrirImagem('{{ colaborador.imagem.url }}')"
-                >
+                />
             {% else %}
-                
                 <img 
                     src="{% static 'img/default-user.png' %}" 
                     alt="Foto padrão"
@@ -17,8 +18,9 @@
                     onclick="abrirImagem('{% static 'img/default-user.png' %}')"
                 />
             {% endif %}
-        </td>
 
+        </td>
+        
         <td>{{ colaborador.nome }}</td>
         <td>{{ colaborador.telefone }}</td>
         <td>{{ colaborador.numero_empresa }}</td>

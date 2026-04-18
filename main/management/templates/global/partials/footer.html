@@ -13,7 +13,11 @@
 
 {% include "global/partials/modal_notificacoes.html" %}
 
+
+
+<script>
+    const urlNotificacoes = "{% url 'management:notificacoes_tarefas' %}";
+</script>
+
 <script src="{% static 'global/js/notificacoes.js' %}?v=202601"></script>
-
-
 

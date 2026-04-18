@@ -3,18 +3,21 @@ console.log('JS DE NOTIFICACOES CARREGOU');
 // ===============================
 // ELEMENTOS DO DOM
 // ===============================
-const btn = document.getElementById('notificacaoBtn');
-const modal = document.getElementById('modalNotificacoes');
-const fechar = document.getElementById('fecharModal');
-const badge = document.getElementById('badgeNotificacao');
-const tabela = document.getElementById('tabelaNotificacoes');
+document.addEventListener("DOMContentLoaded", function () {
 
-// ===============================
-// VALIDAÇÃO DO DOM
-// ===============================
-if (!btn || !modal || !fechar || !badge || !tabela) {
-    console.error('Elementos de notificação não encontrados');
-} else {
+    const btn = document.getElementById('notificacaoBtn');
+    const modal = document.getElementById('modalNotificacoes');
+    const fechar = document.getElementById('fecharModal');
+    const badge = document.getElementById('badgeNotificacao');
+    const tabela = document.getElementById('tabelaNotificacoes');
+
+    // ===============================
+    // VALIDAÇÃO DO DOM
+    // ===============================
+    if (!btn || !modal || !fechar || !badge || !tabela) {
+        console.error('Elementos de notificação não encontrados');
+        return;
+    }
 
     // ===============================
     // EVENTOS
@@ -23,7 +26,7 @@ if (!btn || !modal || !fechar || !badge || !tabela) {
     fechar.onclick = () => modal.style.display = 'none';
 
     // ===============================
-    // FORMATAR TEMPO (MINUTOS → HUMANO)
+    // FORMATAR TEMPO
     // ===============================
     function formatarTempo(valor) {
         const minutos = parseInt(valor, 10);
@@ -53,8 +56,20 @@ if (!btn || !modal || !fechar || !badge || !tabela) {
     // CARREGAR NOTIFICAÇÕES
     // ===============================
     function carregarNotificacoes() {
-        fetch('/notificacoes/')
-            .then(res => res.json())
+
+        // 🚨 usa URL dinâmica do Django
+        if (typeof urlNotificacoes === "undefined") {
+            console.error("URL de notificações não definida!");
+            return;
+        }
+
+        fetch(urlNotificacoes)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Erro na requisição: " + res.status);
+                }
+                return res.json();
+            })
             .then(data => {
 
                 tabela.innerHTML = '';
@@ -100,4 +115,4 @@ if (!btn || !modal || !fechar || !badge || !tabela) {
     // ===============================
     carregarNotificacoes();
     setInterval(carregarNotificacoes, 60000);
-}
+});
