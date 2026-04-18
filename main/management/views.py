@@ -795,7 +795,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from .models import Tarefa
 
-@login_required()
+
 def notificacoes_tarefas(request):
     agora = timezone.now()
     notificacoes = []

@@ -185,7 +185,7 @@ function gerarExportacao() {
     const form = document.getElementById('form-dashboard');
     const params = new URLSearchParams(new FormData(form)).toString();
 
-    fetch(`/relatorios/dashboard/?${params}`)
+    fetch(`/relatorios/dashboard/dados/?${params}`)
         .then(async res => {
             const text = await res.text();
 
