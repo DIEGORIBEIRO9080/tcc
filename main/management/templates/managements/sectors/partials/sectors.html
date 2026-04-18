@@ -9,19 +9,19 @@
             {% if setor.imagem %}
                 {% with img_url=setor.imagem.url %}                
                     <img 
-                        src="static/{{ img_url }}" 
+                        src="{{ img_url }}" 
                         alt="Foto de {{ setor.nome }}"
                         class="img-thumb"
-                        onclick="abrirImagem('static/{{ img_url }}')"
+                        onclick="abrirImagem('{{ img_url }}')"
                     />
                 {% endwith %}
             {% else %}
                 {% with img_url=default_img %}
                     <img 
-                        src="static/{{ img_url }}" 
+                        src="{{ img_url }}" 
                         alt="Foto padrão"
                         class="img-thumb"
-                        onclick="abrirImagem('static/{{ img_url }}')"
+                        onclick="abrirImagem('{{ img_url }}')"
                     />
                 {% endwith %}
             {% endif %}
