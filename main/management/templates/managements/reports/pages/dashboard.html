@@ -1,7 +1,9 @@
+{% load static %}
 {% include 'managements/reports/partials/head.html' %}
 {% include 'managements/sectors/partials/head.html' %}
 
 <body>
+    <button class="menu-toggle">☰</button>
     {% include 'global/partials/sidebar.html' %}
 
     <div class="content">
@@ -10,7 +12,7 @@
     <div class="table-wrapper">
 
     
-    <form id="form-dashboard" class="reports-form">
+    <form id="form-dashboard" class="reports-form" onsubmit="event.preventDefault();">
 
         <h2 style="color:white; text-align:center; margin-bottom:25px;">
             Dashboard de Relatórios
@@ -87,9 +89,9 @@
                 <h3>Prioridade</h3>
                 <select name="prioridade">
                     <option value="">Todas</option>
-                    <option value="baixa">Baixa</option>
-                    <option value="media">Média</option>
-                    <option value="alta">Alta</option>
+                    <option value="baixo">Baixa</option>
+                    <option value="medio">Média</option>
+                    <option value="alto">Alta</option>
                 </select>
             </div>
 
@@ -168,6 +170,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+    const DASHBOARD_URL = "{% url 'management:dashboard_relatorios' %}";
 let chart = null;
 
 function toggleDropdown(id) {
@@ -185,7 +188,7 @@ function gerarExportacao() {
     const form = document.getElementById('form-dashboard');
     const params = new URLSearchParams(new FormData(form)).toString();
 
-    fetch(`/relatorios/dashboard/dados/?${params}`)
+    fetch(`${DASHBOARD_URL}?${params}`)
         .then(async res => {
             const text = await res.text();
 
@@ -218,6 +221,7 @@ function gerarExportacao() {
             let titulo = data.titulo_tipo || 'Relatório';
 
             if (data.mes) {
+                // Formatar título: "Tarefas por Setor - ago-dez (2026)"
                 titulo += ` - ${data.mes}`;
             }
 

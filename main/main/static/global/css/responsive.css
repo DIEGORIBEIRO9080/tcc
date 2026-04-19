@@ -1,0 +1,229 @@
+/* ===============================
+   MEDIA QUERIES PARA RESPONSIVIDADE
+   =============================== */
+
+/* Notebooks menores (até 1366px) */
+@media (max-width: 1366px) {
+    body {
+        grid-template-columns: 180px 1fr !important;
+    }
+
+    .sidebar {
+        width: 180px !important;
+    }
+
+    .header .title {
+        font-size: 18px !important;
+        padding-left: 40px !important;
+    }
+
+    .notificacao-area {
+        right: 80px !important;
+    }
+
+    .table-wrapper {
+        width: 98% !important;
+        margin: 0 auto !important;
+    }
+
+    .titleTable {
+        padding-left: 30px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .headerTable {
+        padding-right: 30px !important;
+    }
+
+    .By, .powered {
+        padding-left: 30px !important;
+        padding-right: 30px !important;
+    }
+}
+
+/* Tablets (até 1024px) */
+@media (max-width: 1024px) {
+    body {
+        grid-template-columns: 160px 1fr !important;
+    }
+
+    .sidebar {
+        width: 160px !important;
+    }
+
+    .logo-ifce {
+        width: 120px !important;
+    }
+
+    .header .title {
+        font-size: 16px !important;
+        padding-left: 20px !important;
+    }
+
+    .notificacao-area {
+        right: 60px !important;
+    }
+
+    .table {
+        width: 98% !important;
+    }
+
+    .headerTable {
+        padding-left: 80px !important;
+    }
+
+    .modal-conteudo {
+        width: 90% !important;
+        max-width: 500px !important;
+    }
+}
+
+/* Telas muito pequenas (até 768px) */
+@media (max-width: 768px) {
+    body {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr auto !important;
+    }
+
+    .menu-toggle {
+        display: block !important;
+    }
+
+    .sidebar {
+        width: 250px !important;
+        position: fixed !important;
+        left: -250px !important;
+        top: 0 !important;
+        height: 100vh !important;
+        z-index: 1000 !important;
+        transition: left 0.3s ease !important;
+    }
+
+    .sidebar.active {
+        left: 0 !important;
+    }
+
+    .logo-ifce {
+        width: 120px !important;
+        margin: 20px auto !important;
+    }
+
+    .sidebar ul {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .sidebar ul li {
+        margin-bottom: 2px !important;
+        width: 100% !important;
+    }
+
+    .sidebar ul li a {
+        padding: 12px 20px !important;
+        display: block !important;
+        text-align: left !important;
+    }
+
+    .content {
+        grid-column: 1 !important;
+        padding: 10px !important;
+        margin-left: 0 !important;
+        transition: margin-left 0.3s ease !important;
+    }
+
+    .content.shifted {
+        margin-left: 250px !important;
+    }
+
+    .header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding-left: 50px !important;
+        margin-top: 20px !important;
+    }
+
+    .header .title {
+        padding-left: 0 !important;
+        margin-bottom: 10px !important;
+        font-size: 16px !important;
+    }
+
+    .notificacao-area {
+        position: static !important;
+        align-self: flex-end !important;
+    }
+
+    /* Ajuste para não sobrepor H1 */
+    .notificacao-area {
+        margin-top: 10px !important;
+    }
+
+    .table {
+        font-size: 12px !important;
+    }
+
+    .btn {
+        padding: 10px 15px !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Celulares (até 480px) */
+@media (max-width: 480px) {
+    .sidebar {
+        width: 220px !important;
+        left: -220px !important;
+    }
+
+    .sidebar.active {
+        left: 0 !important;
+    }
+
+    .sidebar ul li a {
+        padding: 10px 15px !important;
+        font-size: 14px !important;
+    }
+
+    .logo-ifce {
+        width: 100px !important;
+        margin: 15px auto !important;
+    }
+
+    .content.shifted {
+        margin-left: 220px !important;
+    }
+
+    .header .title {
+        font-size: 12px !important;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+
+    .modal-conteudo {
+        width: 95% !important;
+        margin: 10% auto !important;
+    }
+
+    /* Ajuste para notificação não sobrepor título */
+    .header {
+        position: relative !important;
+        min-height: 60px !important;
+    }
+
+    .notificacao-area {
+        position: absolute !important;
+        top: 10px !important;
+        right: 10px !important;
+    }
+
+    .header .title {
+        max-width: calc(100% - 50px) !important;
+        word-wrap: break-word !important;
+    }
+}

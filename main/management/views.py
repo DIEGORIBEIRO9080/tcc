@@ -707,71 +707,118 @@ def gerar_relatorio(request):
 
 @login_required()
 def dashboard_relatorios(request):
-    tipo = request.GET.get('tipo', 'setor')
+    try:
+        tipo = request.GET.get('tipo', 'setor')
 
-    setores = request.GET.getlist('setores')
-    colaboradores = request.GET.getlist('colaboradores')
-    status = request.GET.get('status')
-    prioridade = request.GET.get('prioridade')
-    nivel_sujeira = request.GET.get('nivel_sujeira')
-    data_inicio = request.GET.get('data_inicio')
-    data_fim = request.GET.get('data_fim')
+        # Ignorar parâmetro exportar se presente
+        exportar = request.GET.get('exportar')
 
-    tarefas = Tarefa.objects.all()
+        setores = request.GET.getlist('setores')
+        colaboradores = request.GET.getlist('colaboradores')
+        status = request.GET.get('status')
+        prioridade = request.GET.get('prioridade')
+        nivel_sujeira = request.GET.get('nivel_sujeira')
+        data_inicio = request.GET.get('data_inicio')
+        data_fim = request.GET.get('data_fim')
 
-    if setores:
-        tarefas = tarefas.filter(setores__id__in=setores)
+        tarefas = Tarefa.objects.all()
 
-    if colaboradores:
-        tarefas = tarefas.filter(colaboradores__id__in=colaboradores)
+        if setores:
+            tarefas = tarefas.filter(setores__id__in=setores)
 
-    if status:
-        tarefas = tarefas.filter(status=status)
+        if colaboradores:
+            tarefas = tarefas.filter(colaboradores__id__in=colaboradores)
 
-    if prioridade:
-        tarefas = tarefas.filter(prioridade=prioridade)
+        if status:
+            tarefas = tarefas.filter(status=status)
 
-    if nivel_sujeira:
-        tarefas = tarefas.filter(nivel_sujeira=nivel_sujeira)
+        if prioridade:
+            tarefas = tarefas.filter(prioridade=prioridade)
 
-    if data_inicio:
-        tarefas = tarefas.filter(data_inicio__gte=parse_date(data_inicio))
+        if nivel_sujeira:
+            tarefas = tarefas.filter(nivel_sujeira=nivel_sujeira)
 
-    if data_fim:
-        tarefas = tarefas.filter(data_termino__lte=parse_date(data_fim))
+        if data_inicio:
+            data_inicio_parsed = parse_date(data_inicio)
+            if data_inicio_parsed:
+                tarefas = tarefas.filter(data_inicio__gte=data_inicio_parsed)
+
+        if data_fim:
+            data_fim_parsed = parse_date(data_fim)
+            if data_fim_parsed:
+                tarefas = tarefas.filter(data_termino__lte=data_fim_parsed)
 
     # ===== AGRUPAMENTO =====
-    if tipo == 'setor':
-        dados = tarefas.values('setores__nome').annotate(total=Count('id'))
-        labels = [d['setores__nome'] for d in dados]
-        titulo_tipo = 'Atividades por Setor'
-    else:
-        dados = tarefas.values('colaboradores__nome').annotate(total=Count('id'))
-        labels = [d['colaboradores__nome'] for d in dados]
-        titulo_tipo = 'Atividades por Colaborador'
+        if tipo == 'setor':
+            dados = tarefas.values('setores__nome').annotate(total=Count('id'))
+            labels = [d['setores__nome'] for d in dados]
+            titulo_tipo = 'Atividades por Setor'
+        else:
+            dados = tarefas.values('colaboradores__nome').annotate(total=Count('id'))
+            labels = [d['colaboradores__nome'] for d in dados]
+            titulo_tipo = 'Atividades por Colaborador'
 
-    valores = [d['total'] for d in dados]
+        valores = [d['total'] for d in dados]
 
-    # ===== MÊS EM PT-BR =====
-    try:
-        locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
-    except:
-        locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
+        # ===== FORMATAR CABEÇALHO COM INTERVALO DE DATAS =====
+        try:
+            locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+        except:
+            locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
 
-    if data_inicio:
-        data_ref = parse_date(data_inicio)
-    else:
-        data_ref = datetime.now().date()
+        # Processar datas para o cabeçalho
+        data_inicio_obj = parse_date(data_inicio) if data_inicio else None
+        data_fim_obj = parse_date(data_fim) if data_fim else None
 
-    mes_pt = data_ref.strftime('%B').capitalize()
-    mes_final = f'{mes_pt} / {data_ref.year}'
+        # Formatar cabeçalho baseado nas datas
+        if data_inicio_obj and data_fim_obj:
+            # Caso tenha intervalo completo
+            if data_inicio_obj.year == data_fim_obj.year:
+                if data_inicio_obj.month == data_fim_obj.month:
+                    # Mês único
+                    mes_inicio = data_inicio_obj.strftime('%b').capitalize()
+                    cabecalho_data = f"{mes_inicio} ({data_inicio_obj.year})"
+                else:
+                    # Intervalo dentro do mesmo ano
+                    mes_inicio = data_inicio_obj.strftime('%b').capitalize()
+                    mes_fim = data_fim_obj.strftime('%b').capitalize()
+                    cabecalho_data = f"{mes_inicio}-{mes_fim} ({data_inicio_obj.year})"
+            else:
+                # Intervalo entre anos diferentes
+                mes_inicio = data_inicio_obj.strftime('%b').capitalize()
+                mes_fim = data_fim_obj.strftime('%b').capitalize()
+                cabecalho_data = f"{mes_inicio} {data_inicio_obj.year} - {mes_fim} {data_fim_obj.year}"
+        elif data_inicio_obj and not data_fim_obj:
+            # Apenas data início
+            mes_inicio = data_inicio_obj.strftime('%b').capitalize()
+            cabecalho_data = f"{mes_inicio} ({data_inicio_obj.year})"
+        elif not data_inicio_obj and data_fim_obj:
+            # Apenas data fim
+            mes_fim = data_fim_obj.strftime('%b').capitalize()
+            cabecalho_data = f"{mes_fim} ({data_fim_obj.year})"
+        else:
+            # Sem datas, usar atual
+            data_atual = datetime.now().date()
+            mes_atual = data_atual.strftime('%b').capitalize()
+            cabecalho_data = f"{mes_atual} ({data_atual.year})"
 
-    return JsonResponse({
-        'labels': labels,
-        'valores': valores,
-        'mes': mes_final,
-        'titulo_tipo': titulo_tipo
-    })
+        return JsonResponse({
+            'labels': labels,
+            'valores': valores,
+            'mes': cabecalho_data,
+            'titulo_tipo': titulo_tipo
+        })
+    except Exception as e:
+        import traceback
+        print(f"Erro no dashboard_relatorios: {e}")
+        traceback.print_exc()
+        return JsonResponse({
+            'error': str(e),
+            'labels': [],
+            'valores': [],
+            'mes': '',
+            'titulo_tipo': 'Erro'
+        }, status=500)
 
 @login_required()
 @permission_required('management.view_tarefa', raise_exception=True)

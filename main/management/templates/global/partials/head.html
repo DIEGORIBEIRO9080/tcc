@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        {% load static %}
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Sistema</title>
@@ -239,7 +240,21 @@
                 cursor: pointer;
                 position: relative;
                 font-size: 22px;
-                
+
+            }
+
+            /* BOTÃO DE MENU HAMBÚRGUER PARA MOBILE */
+            .menu-toggle {
+                display: none;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1001;
             }
 
             /* BADGE */
@@ -459,10 +474,9 @@
                 background-color: #0B1739;
                 color: white;
                 width: 220px;
-                min-height: 100vh;
+                height: 100vh;
                 display: flex;
                 flex-direction: column;
-                align-items: center;
                 padding: 20px 0;
                 box-shadow: 2px 0 10px rgba(0,0,0,0.4);
                 position: fixed;
@@ -473,8 +487,8 @@
             /* logo */
             .logo-ifce {
                 width: 150px;
-                margin: 20px 0; /* espaço acima e abaixo da logo */
-                position: relative;
+                margin: 0 auto 20px;
+                display: block;
             }
 
             /* linhas acima e abaixo da logo */
@@ -483,9 +497,9 @@
                 content: "";
                 display: block;
                 height: 1px;
-                background-color: #ffffff; /* mesma cor do texto */
-                width: 100%; 
-                margin: 10px 0; /* distância da logo */
+                background-color: #ffffff;
+                width: 100%;
+                margin: 10px 0;
             }
 
             /* lista de links */
@@ -493,11 +507,14 @@
                 list-style: none;
                 padding: 0;
                 width: 100%;
+                flex: 1;
+                overflow-y: auto;
+                margin: 0;
             }
 
             .sidebar ul li {
                 width: 100%;
-                margin-bottom: 10px;
+                margin-bottom: 5px;
             }
 
             .sidebar ul li a {
@@ -520,7 +537,7 @@
             .sidebar hr {
                 width: 80%;
                 border: 0.5px solid rgba(255,255,255,0.2);
-                margin: 20px auto;
+                margin: 15px auto;
             }
 
 
@@ -540,3 +557,46 @@
 
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        <link rel="stylesheet" href="{% static 'global/css/responsive.css' %}">
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const menuToggle = document.querySelector('.menu-toggle');
+                const sidebar = document.querySelector('.sidebar');
+                const content = document.querySelector('.content');
+
+                // Função simples para ajustar altura
+                function ajustarSidebar() {
+                    if (sidebar) {
+                        sidebar.style.height = window.innerHeight + 'px';
+                    }
+                }
+
+                // Ajustar altura inicial e no redimensionamento
+                ajustarSidebar();
+                window.addEventListener('resize', ajustarSidebar);
+
+                if (menuToggle && sidebar) {
+                    menuToggle.addEventListener('click', function() {
+                        sidebar.classList.toggle('active');
+                        if (content) {
+                            content.classList.toggle('shifted');
+                        }
+                    });
+
+                    // Fechar sidebar ao clicar fora em mobile
+                    document.addEventListener('click', function(event) {
+                        const isMobile = window.innerWidth <= 768;
+                        if (isMobile && sidebar.classList.contains('active') &&
+                            !sidebar.contains(event.target) &&
+                            !menuToggle.contains(event.target)) {
+                            sidebar.classList.remove('active');
+                            if (content) {
+                                content.classList.remove('shifted');
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
